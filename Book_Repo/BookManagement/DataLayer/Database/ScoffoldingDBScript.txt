@@ -1,0 +1,16 @@
+Read Me
+
+======================
+1. Scaffold-DbContext to update DB models from latest DB
+
+
+
+
+
+
+
+Scaffold-DbContext "Server=(LocalDB)\MSSQLLocalDB;Database=BookMgtDB;TrustServerCertificate=True" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Entities -Tables TblUserMst,TblCategoryMst,TblSubCategoryMst,TblPermissionMst,TblAccessMst,TblUserAccessPermission,TblBookMst,TblBookDownloadMst
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Scaffold-DbContext "Data Source=ARCHE-ITD450\SQLEXPRESS;Initial Catalog=BookMgtDB;User Id=sa;Password=123" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Entities -Tables TblUserMst -Force

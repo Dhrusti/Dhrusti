@@ -1,0 +1,280 @@
+﻿@inject IHttpContextAccessor HttpContextAccessor
+@model IEnumerable<CategoryModel>
+@{
+    ViewData["Title"] = "Category";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    Pagination pagination = new Pagination();
+
+    int pageNo = 0;
+
+    if (ViewBag.Pagination != null)
+    {
+        pagination = ViewBag.Pagination;
+        pageNo = pagination.CurrentPage;
+    }
+
+
+
+
+
+    int IsAccess = 0;
+    bool IsLoggedIn = false;
+    var user = HttpContextAccessor.HttpContext.Session.GetObject<UserMstModel>("User");
+    var UserId = HttpContextAccessor.HttpContext.Session.GetString("UserId");
+    if (!string.IsNullOrWhiteSpace(UserId))
+    {
+
+        if (HttpContextAccessor.HttpContext.Session.GetString("AccessId") == "1")
+        {
+            IsAccess = 1;
+        }
+    }
+    if (user != null)
+    {
+        IsLoggedIn = true;
+    }
+    if (IsLoggedIn)
+    {
+
+    }
+    else
+    {
+        Context.Response.Redirect("/Authentication/LogOut");
+    }
+
+
+    int AddHasAccessPermission = 0;
+    int DeleteHasAccessPermission = 0;
+    int EditHasAccessPermission = 0;
+    int ViewHasAccessPermission = 0;
+
+    //var user = HttpContextAccessor.HttpContext.Session.GetObject<UserMstModel>("User");
+    var userRoleList = HttpContextAccessor.HttpContext.Session.GetObject<List<UserPermissionModel>>("UserRoleList");
+    //var userRoleList = HttpContext.Session.GetObject<List<UserPermissionModel>>("UserRoleList");
+    if (user != null)
+    {
+        if (userRoleList != null)
+        {
+            userRoleList = userRoleList.Where(x => x.UserId == user.UserId).ToList();
+            if (userRoleList.Count > 0)
+            {
+                userRoleList = userRoleList.Where(x => x.Permissionid == 1).ToList();
+                if (userRoleList.Count > 0)
+                {
+                    var AccessDetail = userRoleList.FirstOrDefault(x => x.AccessId == 1);
+                    if (AccessDetail != null)
+                    {
+                        AddHasAccessPermission = 1;
+                    }
+                }
+            }
+        }
+
+        if (userRoleList != null)
+        {
+            userRoleList = userRoleList.Where(x => x.UserId == user.UserId).ToList();
+            if (userRoleList.Count > 0)
+            {
+                userRoleList = userRoleList.Where(x => x.Permissionid == 1).ToList();
+                if (userRoleList.Count > 0)
+                {
+                    var AccessDetail = userRoleList.FirstOrDefault(x => x.AccessId == 2);
+                    if (AccessDetail != null)
+                    {
+                        DeleteHasAccessPermission = 2;
+                    }
+                }
+            }
+        }
+
+        if (userRoleList != null)
+        {
+            userRoleList = userRoleList.Where(x => x.UserId == user.UserId).ToList();
+            if (userRoleList.Count > 0)
+            {
+                userRoleList = userRoleList.Where(x => x.Permissionid == 1).ToList();
+                if (userRoleList.Count > 0)
+                {
+                    var AccessDetail = userRoleList.FirstOrDefault(x => x.AccessId == 3);
+                    if (AccessDetail != null)
+                    {
+                        EditHasAccessPermission = 3;
+                    }
+                }
+            }
+        }
+
+        if (userRoleList != null)
+        {
+            userRoleList = userRoleList.Where(x => x.UserId == user.UserId).ToList();
+            if (userRoleList.Count > 0)
+            {
+                userRoleList = userRoleList.Where(x => x.Permissionid == 1).ToList();
+                if (userRoleList.Count > 0)
+                {
+                    var AccessDetail = userRoleList.FirstOrDefault(x => x.AccessId == 4);
+                    if (AccessDetail != null)
+                    {
+                        ViewHasAccessPermission = 4;
+                    }
+                }
+            }
+        }
+    }
+}
+
+<style>
+	.deletebtn {
+		width: auto;
+		padding: 10px 18px;
+		background-color: #bf0d0d;
+		border-radius: 1px;
+	}
+
+	.editbtn {
+		width: auto;
+		padding: 10px 18px;
+		background-color: #008CBA;
+		border-radius: 1px;
+	}
+
+	.addbtn {
+		width: auto;
+		padding: 10px 18px;
+		background-color: #4CAF50;
+		border-radius: 1px;
+	}
+
+	
+	.btn {
+		color : #000000;
+	}
+</style>
+
+<head>
+    <link href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css" rel="stylesheet" />
+    @*<link href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css" rel="stylesheet" />*@
+</head>
+<h2></h2>
+
+@if (AddHasAccessPermission == 1)
+{
+    <span class="float-end"> <a asp-action="CreateCategory" asp-controller="Category" class="btn addbtn" style="float:right;">New Category</a></span>
+}
+<br />
+<br />
+@using (Html.BeginForm("Index", "Category", FormMethod.Get))
+{
+    <div>
+        <p>@ViewBag.Error</p>
+    </div>
+
+
+    @if (Model != null && Model.Count() > 0)
+    {
+        <table id="parentdiv" class="table" style="width:100%">
+            <thead>
+                <tr>
+                    <td>
+                       <b> @Html.DisplayNameFor(model => model.CategoryName)</b>
+                    </td>
+
+                    <td>
+                        @if (EditHasAccessPermission == 3 || DeleteHasAccessPermission == 2)
+                        {
+                           <b> @Html.DisplayName("Action")</b>
+                        }
+                    </td>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.CategoryName)
+                        </td>
+                        <td>
+                            @if (EditHasAccessPermission == 3)
+                            {
+                                @Html.ActionLink("Edit", "UpdateCategory", new { id = item.CategoryId }, htmlAttributes: new { @class = "btn editbtn" })
+                            }
+
+                            @if (DeleteHasAccessPermission == 2)
+                            {
+                                @Html.ActionLink("Delete", "DeleteCategory", new { id = item.CategoryId}, new { @class = "btn deletebtn", @OnClick = "return confirm('Are you sure delete this Category? All Connected Category Remove!!');" })
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+@*
+
+        <div class="" container>
+            @if (pagination.TotalPages > 0)
+            {
+                <ul class="pagination justify-content-end">
+
+                    @if (pagination.CurrentPage > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-controller="Category" asp-action="CategoryIndex" asp-route-pg="1"> First </a>
+                        </li>
+
+                        <li>
+                            <a class="page-link" asp-controller="Category" asp-action="CategoryIndex" asp-route-pg="@(pagination.CurrentPage - 1)"> Pervious </a>
+                        </li>
+                    }
+
+
+                    @for (var pge = pagination.StartPage; pge <= pagination.EndPage; pge++)
+                    {
+                        <li class="page-item @(pge == pagination.CurrentPage ? "active" : "")">
+                            <a class="page-link" asp-controller="Category" asp-action="CategoryIndex" asp-route-pg="@pge"> @pge </a>
+                        </li>
+                    }
+                    @if (pagination.CurrentPage < pagination.TotalPages)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-controller="Category" asp-action="CategoryIndex" asp-route-pg="@(pagination.CurrentPage + 1)"> Next </a>
+                        </li>
+
+                        <li>
+                            <a class="page-link" asp-controller="Category" asp-action="CategoryIndex" asp-route-pg="@(pagination.TotalPages)"> Last </a>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>*@
+    }
+
+    else
+    {
+        <h3 class="alert-warning"> No Data Found...</h3>
+    }
+
+
+}
+
+@section Scripts {
+
+<script type="text/javascript">
+
+     $(document).ready(function(){
+     
+        $('#parentdiv').DataTable({
+            pagingType: 'full_numbers',
+        });
+    });
+</script>
+}
+
+
+@*<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>*@
+@*<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>*@
+

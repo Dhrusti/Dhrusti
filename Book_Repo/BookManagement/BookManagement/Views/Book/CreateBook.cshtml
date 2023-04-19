@@ -1,0 +1,241 @@
+﻿@model BookManagement.Models.BookModel
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    ViewData["Title"] = "CreateBook";
+    bool IsLoggedIn = false;
+    var user = HttpContextAccessor.HttpContext.Session.GetObject<UserMstModel>("User");
+
+    if (user != null)
+    {
+        IsLoggedIn = true;
+    }
+    if (IsLoggedIn)
+    {
+
+    }
+    else
+    {
+        Context.Response.Redirect("/Authentication/LogOut");
+    }
+
+}
+<script src="~/Scripts/jquery-1.10.2.js"></script>
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+<html>
+    <body>
+
+    </body>
+</html>
+<div id="divEmp">
+
+
+
+
+    <div class="form-horizontal">
+
+        <hr />
+
+        <H1>Books</H1>
+        <div class="row">
+            <div class="col-md-4">
+                <form method="post" asp-action="CreateBook" asp-controller="Book" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="alert-danger"></div>
+                    <div class="form-group">
+                        <div>
+                            @Html.Label("CategoryName")
+                            <div>
+                                @Html.DropDownList("CategoryId", new SelectList(@ViewBag.categoryList, "Value", "Text"), "Select Category", htmlAttributes: new { @class = "form-control" ,required="requierd"} )
+                                <span asp-validation-for="CategoryId" class="alert-danger"></span>
+                                <br />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div>
+                            @Html.Label("SubCategoryName")
+                            <div>
+
+                                @Html.DropDownList("SubCategoryId",  new SelectList(@ViewBag.subcategoryList, "Value", "Text"), "Select SubCategory", htmlAttributes: new { @class = "form-control" ,required="requierd"})
+                                <span asp-validation-for="SubCategoryId" class="alert-danger"></span>
+                                <br />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="BookName" class="control-label"></label>
+                        <input asp-for="BookName" class="form-control" required="requierd" />
+
+                        @*  @Html.ValidationMessageFor(model => model.BookName, "", new { @class = "text-danger" })*@
+                        <span asp-validation-for="BookName" class="alert-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="AuthorName" class="control-label"></label>
+                        <input asp-for="AuthorName" class="form-control" required="requierd"/>
+                        <span asp-validation-for="AuthorName" class="alert-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="BookPages" class="control-label"></label>
+                        <input  asp-for="BookPages" class="form-control"  required="requierd"/>
+                        <span asp-validation-for="BookPages" class="alert-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Publisher" class="control-label"></label>
+                        <input asp-for="Publisher" class="form-control" required="requierd" />
+                        <span asp-validation-for="Publisher" class="alert-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="PublishDate" class="control-label"></label>
+                        <input asp-for="PublishDate" class="form-control"  required="requierd"/>
+                        <span asp-validation-for="PublishDate" class="alert-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Edition" class="control-label"></label>
+                        <input asp-for="Edition" class="form-control" required="requierd" />
+                        <span asp-validation-for="Edition" class="alert-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Description" class="control-label"></label>
+                        <input asp-for="Description" class="form-control" required="requierd" />
+                        <span asp-validation-for="Description" class="alert-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Price" class="control-label"></label>
+                        <input maxlength="10" asp-for="Price" class="form-control" required="requierd" />
+                        <span asp-validation-for="Price" class="alert-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="CoverImagePath"></label>
+                        <input type="file" id="fileUpload" asp-for="CoverImagePath" required="requierd" />
+                        <span asp-validation-for="CoverImagePath" class="alert-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Pdfpath"></label>
+                        <input type="file" id="fileUpload" asp-for="Pdfpath" required="requierd" />
+                        <span asp-validation-for="Pdfpath" class="alert-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        @* <input type="button" id="BookData" enctype="multipart/form-data"
+                            value="Create" class="btn btn-primary" />*@
+                        <input type="submit" method="post" asp-action="CreateBook" asp-controller="Book" enctype="multipart/form-data"
+                               value="Create" class="btn btn-primary" name="submit" id="submit" onclick="validate()" />
+                        <a asp-action="BookIndex" class="btn btn-danger">Cancel</a>
+                        <h4 style="color:red">@ViewBag.Message</h4>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+
+        $("#CategoryId").change(function(){
+
+            $("#SubCategoryId").removeAttr("disabled");
+                   var subcategory = $('#CategoryId').val();
+                  $.ajax({
+                      url: "/Book/BooksIndex2?id="+subcategory,
+                      type: "GET",
+                      success: function (res) {
+                          $("#SubCategoryId").html("");
+                            var list = $("#SubCategoryId");
+                               $("#SubCategoryId").val("Select SubCategory");
+                            $.each(res, function(index, item) {
+                            list.append(new Option(item.text, item.value));
+                          });
+                      }
+                  });
+            });
+       });
+
+       function validate() {
+
+
+           var validfile= false;
+           if(document.getElementById("CoverImagePath").files.length > 0 && document.getElementById("Pdfpath").files.length > 0)
+           {
+                validfile=true;
+            }
+           if(validfile==true)
+           {
+
+
+            }
+              else
+            {
+                alert("File Not Selected");
+                return false;
+            }
+          }
+
+
+
+    //   $("#BookData").click(function()
+    //    {
+    //                            // Adding one more key to FormData object
+    //         fileData.append('BookName', $("#BookName1").val());
+
+    //         console.log(fileData);
+    //         debugger;
+
+
+    //        var validfile= false;
+    //        if(document.getElementById("CoverImagePath").files.length > 0 && document.getElementById("Pdfpath").files.length > 0)
+    //        {
+    //            validfile=true;
+    //        }
+    //        if(validfile==true){
+    //            debugger;
+    //            var res=  $('#BookFormdata').text(
+    //                 JSON.stringify($('form').serialize())
+    //            );
+
+    //            console.log(JSON.stringify(res));
+    //            alert(res);
+
+    //            debugger;
+
+    //            $.ajax({
+    //                url: "/Book/CreateBook",
+    //                type: "POST",
+    //                data: res,
+    //                dataType: "json",
+    //                contentType: 'application/json; charset=utf-8',
+
+    //                success: function(response) {
+    //                    console.log(response);
+    //                    debugger;
+    //                    Swal.fire({
+    //                        title: "Changes Saved...!!!",
+    //                        text: "Saved...!!!",
+    //                        icon: 'success',
+    //                        showCancelButton: false,
+    //                        confirmButtonColor: '#3085d6',
+    //                        cancelButtonColor: '#d33',
+    //                        confirmButtonText: response.message,
+    //                    }).then((result) => {
+    //                        if (result.isConfirmed) {
+    //                            window.location = "/GetAllUsers";
+    //                        }
+    //                    })
+    //                },
+    //                error: function(er) {
+    //                    console.log(er);
+    //                }
+    //            });
+    //        }
+    //        else
+    //        {
+    //            alert("File Not Selected");
+    //            return false;
+    //        }
+    //});
+
+</script>

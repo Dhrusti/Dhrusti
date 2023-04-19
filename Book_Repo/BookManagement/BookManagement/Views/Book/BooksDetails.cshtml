@@ -1,0 +1,22 @@
+﻿@model IEnumerable<BookViewModel>
+@{
+	ViewData["Title"] = "ViewBook";
+	 Layout = "~/Views/Shared/LayoutHtml.cshtml";
+}
+
+		<div class="row">
+
+			@foreach (var item in Model)
+			{
+				<div class="col-md-3">
+					<div class="alert alert-success" role="alert">
+						@*<a asp-action="ViewBook" asp-route-id=@item.BookId class="btn btn-success" style="float:right;">Download</a>
+					<hr/>*@
+						<img src="~/Images/@item.CoverImagePath" alt="@item.CoverImagePath" height="200px" width="200px" id="imgDisplay" />
+						<br />
+						<div class="a"><a asp-action="ViewBook" asp-route-id=@item.BookId style="float:left;"><h3 style="color:black;">@item.BookName</h3></a></div>
+						@*<div>*@
+					</div>
+				</div>
+			}
+		</div>

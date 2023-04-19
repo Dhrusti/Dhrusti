@@ -1,0 +1,163 @@
+﻿@using Microsoft.AspNetCore.Http
+@using BookManagement.Models
+
+@inject IHttpContextAccessor HttpContextAccessor
+@using Microsoft.AspNetCore.Http
+@using BookManagement.Models
+@{
+    //var user = String.Empty;
+    bool IsAdmin = false;
+    bool IsLoggedIn = false;
+    //var users = String.Empty;
+
+
+
+
+    var user = HttpContextAccessor.HttpContext.Session.GetObject<UserMstModel>("User");
+    var userRoleList = HttpContextAccessor.HttpContext.Session.GetObject<List<UserPermissionModel>>("UserRoleList");
+    //if (user == null)
+    //{
+    //	Context.Response.Redirect("/Authentication/LogOut");
+    //}
+
+
+    if (user != null)
+    {
+
+        IsLoggedIn = true;
+    }
+    if (IsLoggedIn)
+    {
+        var roleid = user.RoleId;
+        if (roleid == 1)
+        {
+            IsAdmin = true;
+        }
+    }
+
+    //HelperClass helperClass = new HelperClass();
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - BookManagement</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/BookManagement.styles.css" asp-append-version="true" />
+    <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="HomePage"><b>BookManagement</b></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        @if (!IsLoggedIn)
+                        {
+                            <li class="nav-item" style="align-items:start">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Homepage"><b>Home</b></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="BooksIndex"><b>Books</b></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="About"><b>About</b></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Contact"><b>Contact</b></a>
+                            </li>
+                            <li class="nav-item ml-auto">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Authentication" asp-action="Login"><b>Login</b></a>
+                            </li>
+                        }
+                        @if (IsLoggedIn)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Category" asp-action="CategoryIndex"><b>Category</b></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="SubCategory" asp-action="SubCategoryIndex"><b>SubCategory</b></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Book" asp-action="BookIndex"><b>Book</b></a>
+                            </li>
+                            if (IsAdmin)
+                            {
+                                <li class="nav-item">
+
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Authentication" asp-action="GetAllUsers"><b>Users</b></a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" id="report"><b>Report</b></a>
+                                </li>
+                            }
+                        }
+                        @*else
+                            {
+                            Context.Response.Redirect("/Authentication/LogOut");
+                            }*@
+                    </ul>
+                    @if (IsLoggedIn)
+                    {
+                        <ul class="nav navbar-nav navbar-right">
+                            <li class="nav-item">
+                                @Html.ActionLink( user.UserName ,"UserProfile", "UserProfile", new { userid = user.UserId }, htmlAttributes: new { @class = "btn btn-light" })
+                                @*<a class="far fa-id-badge" asp-area="" asp-controller="UserProfile" asp-action="UserProfile" >@user.UserName</a>*@
+                                <div>
+                                    <a class="fa fa-sign-out" asp-area="" asp-controller="Authentication" asp-action="LogOut" style="margin-left: 14px;">LogOut</a>
+                                </div>
+                            </li>
+                        </ul>
+                    }
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+    <footer class="border-top footer text-muted">
+        <div class="container" style="color:black">
+            &copy; 2022 - BookManagement - <a asp-area="" asp-controller="Home" asp-action="About">About Us</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script type="text/javascript">
+            function preventBack() { window.history.forward(); }
+            setTimeout("preventBack()", 0);
+            window.onunload = function() { null };
+
+
+            window.history.forward();
+            function noBack() {
+                window.history.forward();
+            }
+
+             $(document).ready(function () {
+
+            $("#report").click(function () {
+                debugger
+                alert("Thanks for Report Downloading....!!!")
+                 window.open("../Report/ReportIndex");
+
+            })
+        })
+    </script>
+
+    @*<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>*@
+ 
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

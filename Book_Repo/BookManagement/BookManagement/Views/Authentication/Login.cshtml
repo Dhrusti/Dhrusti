@@ -1,0 +1,92 @@
+﻿@model BookManagement.Models.LoginModel
+@{
+	Layout = "LayoutHtml";
+}
+
+<style>
+	.cancelbtn {
+  width: auto;
+  padding: 10px 18px;
+  background-color: #bf0d0d;
+    }
+
+    .submitbtn {
+  width: auto;
+  padding: 10px 18px;
+  background-color: #008CBA;
+    }
+	.btn {
+		color : #000000;
+	}
+</style>
+
+<div class="container-xxl">
+	<div class="authentication-wrapper authentication-basic container-p-y">
+		<div class="authentication-inner">
+			<!-- Login Starts-->
+			<div class="row">
+				<div class="col-md-4"></div>
+				<div class="col-md-4">
+					@*<div asp-validation-summary="ModelOnly" class="alert-danger"></div>*@
+					<br />
+					<br />
+
+					<center><h4><b>Login</b></h4></center>
+					<hr />
+					<form class="mb-3" asp-controller="Authentication" asp-action="Login" method="POST">
+						<div class="mb-3">
+
+							<label for="email" class="form-label"><b>Email</b></label>
+							    <input type="text" class="form-control txtemail" id="email" name="email" placeholder="Enter your email or username" autofocus required="required" />
+							@*<span asp-validation-for="Email" class="alert-danger"></span>*@
+
+
+						</div>
+						<div class="mb-3 form-password-toggle">
+							<div class="d-flex justify-content-between">
+
+								<label class="form-label" for="password"><b>Password</b></label>
+
+							</div>
+
+							<div class="input-group input-group-merge">
+								<input type="password"
+									   id="password"
+									   class="form-control"
+									   name="password"
+									   placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
+                                       aria-describedby="password" required="required" />
+
+
+								<span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+							</div>
+                            <a href="~/Authentication/ForgotPassword">
+                                <small style="float:right"><b>Forgot Password?</b></small>
+                            </a>
+						</div>
+						<div class="mb-3">
+
+							<button class=" d-grid w-100 submitbtn" type="submit">Sign in</button>
+
+						 
+							
+						</div>
+					</form>
+
+                    <form><button asp-controller="Home" asp-action="HomePage" class="d-grid w-100 cancelbtn">Cancel</button></form>
+                    <h5 style="color:green">@ViewBag.message</h5>
+					@*<p class="text-center">
+						<span>New on our platform?</span>
+						<a href="~/Authentication/Registration">
+							<span>Create an account</span>
+						</a>
+					</p>*@
+				</div>
+				<div class="col-md-4"></div>
+			</div>
+			<!-- /Login Ends-->
+		</div>
+	</div>
+</div>
+
+
