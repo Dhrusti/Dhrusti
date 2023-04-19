@@ -1,0 +1,147 @@
+{
+    "Routes": [
+        {
+            "DownstreamPathTemplate": "/api/Authentication/Login",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "192.168.1.151",
+                    "Port": 8051
+                }
+            ],
+            "UpstreamPathTemplate": "/Authentication/Login",
+            "UpstreamHttpMethod": [ "GET", "PUT", "POST" ]
+        },
+
+        {
+            "DownstreamPathTemplate": "/api/Authentication/Registration",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "192.168.1.151",
+                    "Port": 8051
+                }
+            ],
+            "UpstreamPathTemplate": "/Authentication/Registration",
+            "UpstreamHttpMethod": [ "GET", "PUT", "POST" ]
+        },
+
+        {
+            "DownstreamPathTemplate": "/api/DropDown/GetAllGender",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "192.168.1.151",
+                    "Port": 8051
+                }
+            ],
+            "UpstreamPathTemplate": "/DropDown/GetAllGender",
+            "UpstreamHttpMethod": [ "GET", "PUT", "POST" ]
+        },
+
+        {
+            "DownstreamPathTemplate": "/api/DropDown/GetGenderById",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "192.168.1.151",
+                    "Port": 8051
+                }
+            ],
+            "UpstreamPathTemplate": "/DropDown/GetGenderById",
+            "UpstreamHttpMethod": [ "GET", "PUT", "POST" ]
+        },
+
+        {
+            "DownstreamPathTemplate": "/api/DropDown/AddGenders",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "192.168.1.151",
+                    "Port": 8051
+                }
+            ],
+            "UpstreamPathTemplate": "/DropDown/AddGenders",
+            "UpstreamHttpMethod": [ "GET", "PUT", "POST" ]
+        },
+
+        {
+            "DownstreamPathTemplate": "/api/DropDown/GetAllEmployementType",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "192.168.1.151",
+                    "Port": 8051
+                }
+            ],
+            "UpstreamPathTemplate": "/DropDown/GetAllEmployementType",
+            "UpstreamHttpMethod": [ "GET", "PUT", "POST" ]
+        },
+
+        {
+            "DownstreamPathTemplate": "/api/User/GetAllUsers",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "192.168.1.151",
+                    "Port": 8052
+                }
+            ],
+            "UpstreamPathTemplate": "/User/GetAllUsers",
+            "UpstreamHttpMethod": [ "GET", "PUT", "POST" ]
+        },
+
+        {
+            "DownstreamPathTemplate": "/api/User/GetUserById",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "192.168.1.151",
+                    "Port": 8052
+                }
+            ],
+            "UpstreamPathTemplate": "/User/GetUserById",
+            "UpstreamHttpMethod": [ "GET", "PUT", "POST" ]
+        },
+
+        {
+            "DownstreamPathTemplate": "/api/User/AddUsers",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "192.168.1.151",
+                    "Port": 8052
+                }
+            ],
+            "UpstreamPathTemplate": "/User/AddUsers",
+            "UpstreamHttpMethod": [ "GET", "PUT", "POST" ]
+        },
+
+        {
+            "DownstreamPathTemplate": "/api/Authentication/Registration",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "192.168.1.151",
+                    "Port": 8053
+                }
+            ],
+            "UpstreamPathTemplate": "/Authentication/Registration",
+            "UpstreamHttpMethod": [ "GET", "PUT", "POST" ]
+        },
+
+        {
+            "DownstreamPathTemplate": "/api/Authentication/Login",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "192.168.1.151",
+                    "Port": 8053
+                }
+            ],
+            "UpstreamPathTemplate": "/Authentication/Login",
+            "UpstreamHttpMethod": [ "GET", "PUT", "POST" ]
+        }
+        
+    ]
+}

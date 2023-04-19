@@ -1,0 +1,14 @@
+﻿Read Me
+
+=======================================
+Install Nuget Before Run This Command :
+=======================================
+Microsoft.EntityFrameworkCore
+Microsoft.EntityFrameworkCore.SqlServer
+Microsoft.EntityFrameworkCore.Design
+Microsoft.EntityFrameworkCore.Tools
+=======================================
+
+1. Scaffold-DbContext to update DB models from latest DB
+
+Scaffold-DbContext "Server=.\SQLEXPRESS;Database=ERP1.ODb;TrustServerCertificate=True;MultipleActiveResultSets=True;User Id=sa;Password=123" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Entities

@@ -1,0 +1,25 @@
+﻿Read Me
+
+=======================================
+Install Nuget Before Run This Command :
+=======================================
+Microsoft.EntityFrameworkCore
+Microsoft.EntityFrameworkCore.SqlServer
+Microsoft.EntityFrameworkCore.Design
+Microsoft.EntityFrameworkCore.Tools
+=======================================
+
+1. Scaffold-DbContext to update DB models from latest DB
+
+Scaffold-DbContext "Server=ARCHE-ITD450\\SQLEXPRESS;Database=ERP_DB;TrustServerCertificate=True;MultipleActiveResultSets=True;User Id=sa;Password=123" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Entities -Tables UserMst -Force
+
+Scaffold-DbContext "Server=ARCHE-ITD450\\SQLEXPRESS;Database=ERP_DB;TrustServerCertificate=True;MultipleActiveResultSets=True;User Id=sa;Password=123" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Entities -Tables UserMst, TokenMst -Force
+
+Scaffold-DbContext "Server=ARCHE-ITD450\\SQLEXPRESS;Database=ERP_DB;TrustServerCertificate=True;MultipleActiveResultSets=True;User Id=sa;Password=123" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Entities -Tables UserMst, TokenMst, GenderMst, EmployementTypeMst, CompanyMst, RoleMst, ReportingManagerMst -Force
+
+Scaffold-DbContext "Server=ARCHE-ITD450\\SQLEXPRESS;Database=ERP_DB;TrustServerCertificate=True;MultipleActiveResultSets=True;User Id=sa;Password=123" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Entities -Tables UserMst, TokenMst, GenderMst, EmployementTypeMst, CompanyMst, RoleMst, ReportingManagerMst, RequirementMst -Force
+
+
+Scaffold-DbContext "Server=ARCHE-ITD450\\SQLEXPRESS;Database=ERP_DB;TrustServerCertificate=True;MultipleActiveResultSets=True;User Id=sa;Password=123" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Entities -Tables UserMst, RegistrationMst, TokenMst, GenderMst, EmployementTypeMst, CompanyMst, RoleMst, ReportingManagerMst, RequirementMst -Force
+
+Scaffold-DbContext "Server=ARCHE-ITD450\\SQLEXPRESS;Database=ERP_DB;TrustServerCertificate=True;MultipleActiveResultSets=True;User Id=sa;Password=123" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Entities -Tables UserMst, RegistrationMst, TokenMst, GenderMst, EmployementTypeMst, CompanyMst, RoleMst, ReportingManagerMst, RequirementMst, DesignationMst -Force

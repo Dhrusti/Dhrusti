@@ -1,0 +1,73 @@
+﻿namespace ERP_CRM.ViewModels.ResViewModel
+{
+	public class GetUserByIdResViewModel
+	{
+		public string EmployeeCode { get; set; } = null!;
+
+		public string FullName { get; set; } = null!;
+
+		public string Gender { get; set; } = null!;
+
+		public string Email { get; set; } = null!;
+
+		public string PhoneNumber { get; set; } = null!;
+
+		public string EmergencyContact { get; set; } = null!;
+
+		public DateTime Dob { get; set; }
+
+		public string UserName { get; set; } = null!;
+
+		public string Password { get; set; } = null!;
+
+		public string ConfirmPassword { get; set; } = null!;
+
+		public string PermanentAddress { get; set; } = null!;
+
+		public string CurrentAddress { get; set; } = null!;
+
+		public string PostCode { get; set; } = null!;
+
+		public int EmploymentType { get; set; }
+
+		public string CompanyName { get; set; } = null!;
+
+		public string Department { get; set; } = null!;
+
+		public string Designation { get; set; } = null!;
+
+		public string Location { get; set; } = null!;
+
+		public string BloodGroup { get; set; } = null!;
+
+		public DateTime OfferDate { get; set; }
+
+		public DateTime JoinDate { get; set; }
+
+		public int Role { get; set; }
+
+		public string BankName { get; set; } = null!;
+
+		public string AccountNumber { get; set; } = null!;
+
+		public string Branch { get; set; } = null!;
+
+		public string Ifsccode { get; set; } = null!;
+
+		public string PfaccountNumber { get; set; } = null!;
+
+		public string PancardNumber { get; set; } = null!;
+
+		public string AdharCardNumber { get; set; } = null!;
+
+		public string Salary { get; set; } = null!;
+
+		public string ReportingManager { get; set; } = null!;
+
+		public string Reason { get; set; } = null!;
+
+		public string EmployeePersonalEmailId { get; set; } = null!;
+
+		public string ProbationPeriod { get; set; } = null!;
+	}
+}
