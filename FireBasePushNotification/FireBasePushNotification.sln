@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32505.173
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "net-core-api-push-notification-demo", "net-core-api-push-notification-demo\net-core-api-push-notification-demo.csproj", "{77731D69-6D0F-4325-B461-28630550677A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{77731D69-6D0F-4325-B461-28630550677A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77731D69-6D0F-4325-B461-28630550677A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77731D69-6D0F-4325-B461-28630550677A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77731D69-6D0F-4325-B461-28630550677A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1F6D701B-2DE1-4206-B806-35E51F37F932}
+	EndGlobalSection
+EndGlobal
