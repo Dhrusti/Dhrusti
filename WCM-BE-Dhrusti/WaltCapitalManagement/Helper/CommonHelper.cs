@@ -1,0 +1,985 @@
+﻿using CorePush.Google;
+using DataLayer.Entities;
+using DTO.ReqDTO;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using System.Data;
+using System.Dynamic;
+using System.Globalization;
+using System.Net;
+using System.Net.Http.Headers;
+using System.Net.Mail;
+using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.RegularExpressions;
+using static DTO.ReqDTO.GoogleNotificationReqDTO;
+
+namespace Helper
+{
+    public class CommonHelper
+    {
+        public const string DATE_FORMAT = "dd/MM/yyyy";
+        private IConfiguration _configuration { get; }
+        private IHostingEnvironment _hostingEnvironment { get; }
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly NotificationSettingsReqDTO _fcmNotificationSetting;
+        private readonly WaltCapitalDBContext _dbContext;
+
+        public CommonHelper(IConfiguration configuration, IHostingEnvironment hostingEnvironment, IHttpContextAccessor httpContextAccessor, IOptions<NotificationSettingsReqDTO> settings, WaltCapitalDBContext dbContext)
+        {
+            _configuration = configuration;
+            _hostingEnvironment = hostingEnvironment;
+            _httpContextAccessor = httpContextAccessor;
+            _fcmNotificationSetting = settings.Value;
+            _dbContext = dbContext;
+        }
+
+        public static DataTable ModelListToDataTable<T>(List<T> items)
+        {
+            DataTable dataTable = new DataTable(typeof(T).Name);
+            //Get all the properties by using reflection   
+            PropertyInfo[] Props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            foreach (PropertyInfo prop in Props)
+            {
+                //Setting column names as Property names  
+                dataTable.Columns.Add(prop.Name);
+            }
+            foreach (T item in items)
+            {
+                var values = new object[Props.Length];
+                for (int i = 0; i < Props.Length; i++)
+                {
+                    values[i] = Props[i].GetValue(item, null);
+                }
+                dataTable.Rows.Add(values);
+            }
+
+            return dataTable;
+        }
+
+        public static DataTable ModelToDataTable<T>(T items)
+        {
+            DataTable dataTable = new DataTable(typeof(T).Name);
+            //Get all the properties by using reflection   
+            PropertyInfo[] Props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            foreach (PropertyInfo prop in Props)
+            {
+                //Setting column names as Property names  
+                dataTable.Columns.Add(prop.Name);
+            }
+
+            var values = new object[Props.Length];
+            for (int i = 0; i < Props.Length; i++)
+            {
+                values[i] = Props[i].GetValue(items, null);
+            }
+            dataTable.Rows.Add(values);
+
+            return dataTable;
+        }
+
+        public List<dynamic> DataTableToDynamicList<T>(DataTable dt)
+        {
+            var dynamicDt = new List<dynamic>();
+            foreach (DataRow row in dt.Rows)
+            {
+                dynamic dyn = new ExpandoObject();
+                dynamicDt.Add(dyn);
+                foreach (DataColumn column in dt.Columns)
+                {
+                    var dic = (IDictionary<string, object>)dyn;
+                    dic[column.ColumnName] = row[column];
+                }
+            }
+            return dynamicDt;
+        }
+
+        public static string GetDateInString(DateTime date)
+        {
+            return date.ToString(DATE_FORMAT).Replace("-", "/");
+        }
+
+        public DateTime GetDateFromString(string date)
+        {
+            return DateTime.ParseExact(date, DATE_FORMAT, CultureInfo.InvariantCulture);
+        }
+
+        public CommonResponse ExecuteCRUDStoreProcedure(string queryText, SqlParameter[] sqlParameters, bool jsonInput = false)
+        {
+            CommonResponse response = new CommonResponse();
+            try
+            {
+                string connectionString = _configuration.GetConnectionString("EntitiesConnection");
+                using (SqlConnection sqlConnection = new SqlConnection(connectionString))
+                {
+                    sqlConnection.Open();
+                    SqlCommand sqlCommand = sqlConnection.CreateCommand();
+                    sqlCommand.Connection = sqlConnection;
+                    sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                    sqlCommand.CommandText = queryText;
+
+                    if (jsonInput)
+                    {
+                        sqlCommand.Parameters.AddWithValue("@InputParam", JsonConvert.SerializeObject(sqlParameters).ToString());
+                    }
+                    else
+                    {
+                        if (sqlParameters != null)
+                        {
+                            foreach (SqlParameter para in sqlParameters)
+                            {
+                                if (para != null)
+                                    sqlCommand.Parameters.Add(para);
+                            }
+                        }
+                    }
+
+                    DataSet ds = new DataSet();
+                    using (SqlDataAdapter sda = new SqlDataAdapter(sqlCommand))
+                    {
+                        sda.Fill(ds);
+                        if (ds.Tables.Count != 0)
+                            response.Data = DataTableToDynamicList<dynamic>(ds.Tables[0]);
+                        response.Status = true;
+                        response.Message = "Success.";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Data = ex;
+                response.Status = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+        public SqlParameter[] GenerateAdvanceSqlParameters(dynamic model, int spType, int PageNumber = 1, int RowsOfPage = 10)
+        {
+            Type ApplicantInfo = model.GetType();
+            PropertyInfo[] properties = ApplicantInfo.GetProperties();
+            var TotalParameters = properties.Count();
+            if (spType == CommonConstant.Delete)
+                TotalParameters = 1;
+            if (spType == CommonConstant.ReadWithFilter)
+                TotalParameters = TotalParameters + 2;
+            SqlParameter[] sqlParameters = new SqlParameter[TotalParameters + 1];
+
+            int i = 0;
+
+            sqlParameters[i] = new SqlParameter();
+            sqlParameters[i].ParameterName = "@CRUDInput";
+            // sqlParameters[i].SqlDbType = SqlDbType.Int;
+            sqlParameters[i].Value = spType;
+            if (spType == CommonConstant.ReadWithFilter)
+            {
+                sqlParameters[i] = new SqlParameter();
+                sqlParameters[i].ParameterName = "@PageNumber";
+                //sqlParameters[i].SqlDbType = SqlDbType.Int;
+                sqlParameters[i].Value = PageNumber;
+
+                sqlParameters[i] = new SqlParameter();
+                sqlParameters[i].ParameterName = "@RowsOfPage";
+                // sqlParameters[i].SqlDbType = SqlDbType.Int;
+                sqlParameters[i].Value = RowsOfPage;
+            }
+
+            if (spType != CommonConstant.Delete)
+            {
+                foreach (PropertyInfo property in properties)
+                {
+                    i++;
+                    sqlParameters[i] = new SqlParameter();
+                    sqlParameters[i].ParameterName = "@" + property.Name.ToString();
+                    //sqlParameters[i].SqlDbType = (SqlDbType)Enum.Parse(typeof(SqlDbType), property.PropertyType.ToString());
+                    sqlParameters[i].Value = model.GetType().GetProperty(property.Name).GetValue(model, null);
+                }
+            }
+            else
+            {
+                i++;
+                sqlParameters[i] = new SqlParameter();
+                sqlParameters[i].ParameterName = "@Id";
+                //sqlParameters[i].SqlDbType = (SqlDbType)Enum.Parse(typeof(SqlDbType), property.PropertyType.ToString());
+                sqlParameters[i].Value = model;
+
+            }
+
+            return sqlParameters;
+        }
+
+        public SqlParameter[] GenerateSqlParameters(dynamic model)
+        {
+            Type ApplicantInfo = model.GetType();
+            PropertyInfo[] properties = ApplicantInfo.GetProperties();
+            var TotalParameters = properties.Count();
+            SqlParameter[] sqlParameters = new SqlParameter[TotalParameters];
+
+            int i = 0;
+            foreach (PropertyInfo property in properties)
+            {
+
+                sqlParameters[i] = new SqlParameter();
+                sqlParameters[i].ParameterName = "@" + property.Name.ToString();
+                //sqlParameters[i].SqlDbType = (SqlDbType)Enum.Parse(typeof(SqlDbType), property.PropertyType.ToString());
+                sqlParameters[i].Value = model.GetType().GetProperty(property.Name).GetValue(model, null);
+                i++;
+            }
+            return sqlParameters;
+        }
+
+        public CommonResponse UploadFile(IFormFile file, string subDirectory, string fileName)
+        {
+            CommonResponse response = new CommonResponse();
+            try
+            {
+                string savePath = string.Empty;
+                string CurrentDirectory = Directory.GetCurrentDirectory();
+                subDirectory = subDirectory ?? string.Empty;
+                var target = Path.Combine(_hostingEnvironment.ContentRootPath, "wwwroot", "Files", subDirectory);
+
+
+                Directory.CreateDirectory(target);
+                savePath = Path.Combine("Files", subDirectory, fileName);
+                var filePath = Path.Combine(target, fileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    file.CopyTo(stream);
+                }
+
+                response.Status = true;
+                response.Message = "File Uploaded";
+                response.Data = savePath;
+            }
+            catch (Exception ex)
+            {
+                response.Data = ex;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+        public CommonResponse UploadFile(string file, string subDirectory, string fileName)
+        {
+            CommonResponse response = new CommonResponse();
+            try
+            {
+                string savePath = string.Empty;
+                string CurrentDirectory = Directory.GetCurrentDirectory();
+                subDirectory = subDirectory ?? string.Empty;
+                var target = Path.Combine(_hostingEnvironment.ContentRootPath, "wwwroot", "Files", subDirectory);
+
+                Directory.CreateDirectory(target);
+                savePath = Path.Combine("Files", subDirectory, fileName);
+                var filePath = Path.Combine(target, fileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    //file.CopyTo(stream);
+                    Byte[] byteArray = System.Convert.FromBase64String(file.Split(',')[1]);
+                    stream.Write(byteArray, 0, byteArray.Length);
+                }
+
+                response.StatusCode = HttpStatusCode.OK;
+                response.Status = true;
+                response.Message = "File Uploaded";
+                response.Data = savePath;
+            }
+            catch (Exception ex)
+            {
+                response.Data = ex;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+        public string SizeConverter(long bytes)
+        {
+            var fileSize = new decimal(bytes);
+            var kilobyte = new decimal(1024);
+            var megabyte = new decimal(1024 * 1024);
+            var gigabyte = new decimal(1024 * 1024 * 1024);
+
+            switch (fileSize)
+            {
+                case var _ when fileSize < kilobyte:
+                    return $"Less then 1KB";
+                case var _ when fileSize < megabyte:
+                    return $"{Math.Round(fileSize / kilobyte, 0, MidpointRounding.AwayFromZero):##,###.##}KB";
+                case var _ when fileSize < gigabyte:
+                    return $"{Math.Round(fileSize / megabyte, 2, MidpointRounding.AwayFromZero):##,###.##}MB";
+                case var _ when fileSize >= gigabyte:
+                    return $"{Math.Round(fileSize / gigabyte, 2, MidpointRounding.AwayFromZero):##,###.##}GB";
+                default:
+                    return "n/a";
+            }
+        }
+
+        public string GenerateRandomOTP()
+        {
+            int iOTPLength = 6;
+            string[] saAllowedCharacters = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" };
+            string sOTP = String.Empty;
+            string sTempChars = String.Empty;
+            Random rand = new Random();
+            for (int i = 0; i < iOTPLength; i++)
+            {
+                int p = rand.Next(0, saAllowedCharacters.Length);
+                sTempChars = saAllowedCharacters[rand.Next(0, saAllowedCharacters.Length)];
+                sOTP += sTempChars;
+            }
+            return sOTP;
+        }
+
+        public CommonResponse SendEmail(SendEmailRequestModel model)
+        {
+            CommonResponse response = new CommonResponse();
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(model.ToEmail))
+                {
+                    MailMessage mail = new MailMessage();
+
+                    //get configration from appsettings.json
+                    string FromEmail = _configuration.GetSection("SiteEmailConfigration:FromEmail").Value;
+                    string Host = _configuration.GetSection("SiteEmailConfigration:Host").Value;
+                    int Port = Convert.ToInt32(_configuration.GetSection("SiteEmailConfigration:Port").Value);
+                    bool EnableSSL = Convert.ToBoolean(_configuration.GetSection("SiteEmailConfigration:EnableSSL").Value);
+                    string Password = _configuration.GetSection("SiteEmailConfigration:MailPassword").Value;
+                    bool EmailEnable = Convert.ToBoolean(_configuration.GetSection("SiteEmailConfigration:EmailEnable").Value);
+                    if (EmailEnable)
+                    {
+                        mail.From = new MailAddress(FromEmail, "Walt Capital Management");
+                        mail.To.Add(new MailAddress(model.ToEmail));
+                        mail.Subject = model.Subject;
+                        mail.Body = model.Body;
+                        mail.IsBodyHtml = true;
+                        //if (model.Attachment != null)
+                        //{
+
+                        //    string path = Convert.ToString(model.Attachment);
+                        //    Attachment attachment = new Attachment(path);
+                        //    mail.Attachments.Add(attachment);
+                        //}
+
+                        if (model.Attachment != null)
+                        {
+                            mail.Attachments.Add(new Attachment(model.Attachment));
+                        }
+
+                        SmtpClient smtp = new SmtpClient();
+                        smtp.Host = Host;
+                        smtp.Port = Port;
+                        smtp.EnableSsl = EnableSSL;
+                        smtp.UseDefaultCredentials = false;
+                        smtp.Credentials = new System.Net.NetworkCredential(FromEmail, Password);
+                        try
+                        {
+                            smtp.Send(mail);
+                        }
+                        catch (Exception)
+                        {
+                            throw;
+                        }
+                    }
+
+                    response.Status = true;
+                    response.Message = "Success.";
+                }
+                else
+                {
+                    response.Message = "Receiver Email Id Not Provided.";
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return response;
+        }
+
+        public void AddLog(string text)
+        {
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                string logFileName = GetCurrentDateTime().ToString("dd/MM/yyyy").Replace('/', '_').ToString() + ".log";
+                var filePath = Path.Combine(_hostingEnvironment.ContentRootPath, "wwwroot", "Logs");
+                var exists = Directory.Exists(filePath);
+                if (!exists)
+                {
+                    Directory.CreateDirectory(filePath);
+                }
+                filePath = Path.Combine(filePath, logFileName);
+                using (StreamWriter writer = new StreamWriter(filePath, true))
+                {
+                    text = GetCurrentDateTime().ToString() + " : " + text;
+                    writer.WriteLine(string.Format(text, GetCurrentDateTime().ToString("dd/MM/yyyy hh:mm:ss tt")));
+                    writer.Close();
+                }
+            }
+        }
+
+        public string CreateRandomPassword(int length = 8)
+        {
+            // Create a string of characters, numbers, special characters that allowed in the password  
+            string validChars = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*?_-";
+            Random random = new Random();
+
+            // Select one random character at a time from the string  
+            // and create an array of chars  
+            char[] chars = new char[length];
+            for (int i = 0; i < length; i++)
+            {
+                chars[i] = validChars[random.Next(0, validChars.Length)];
+            }
+            return new string(chars);
+        }
+
+        public string EncryptString(string plainText)
+        {
+            var key = Encoding.UTF8.GetBytes(_configuration["EncryptionSecurityKey"].ToString());
+            var iv = Encoding.UTF8.GetBytes(_configuration["EncryptionSecurityIV"].ToString());
+            // Check arguments.
+            if (plainText == null || plainText.Length <= 0)
+            {
+                throw new ArgumentNullException("plainText");
+            }
+            if (key == null || key.Length <= 0)
+            {
+                throw new ArgumentNullException("key");
+            }
+            if (iv == null || iv.Length <= 0)
+            {
+                throw new ArgumentNullException("key");
+            }
+            byte[] encrypted;
+            // Create a RijndaelManaged object
+            // with the specified key and IV.
+            using (var rijAlg = new RijndaelManaged())
+            {
+                rijAlg.Mode = CipherMode.CBC;
+                rijAlg.Padding = PaddingMode.PKCS7;
+                rijAlg.FeedbackSize = 128;
+
+                rijAlg.Key = key;
+                rijAlg.IV = iv;
+
+                // Create a decrytor to perform the stream transform.
+                var encryptor = rijAlg.CreateEncryptor(rijAlg.Key, rijAlg.IV);
+
+                // Create the streams used for encryption.
+                using (var msEncrypt = new MemoryStream())
+                {
+                    using (var csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                    {
+                        using (var swEncrypt = new StreamWriter(csEncrypt))
+                        {
+                            //Write all data to the stream.
+                            swEncrypt.Write(plainText);
+                        }
+                        encrypted = msEncrypt.ToArray();
+                    }
+                }
+            }
+            // Return the encrypted bytes from the memory stream.
+
+            return Convert.ToBase64String(encrypted);
+            //return encrypted;
+        }
+
+        public string DecryptString(string cipherText)
+        {
+            var key = Encoding.UTF8.GetBytes(_configuration["EncryptionSecurityKey"].ToString());
+            var iv = Encoding.UTF8.GetBytes(_configuration["EncryptionSecurityIV"].ToString());
+            var encrypted = Convert.FromBase64String(cipherText);
+            // Check arguments.
+            if (encrypted == null || encrypted.Length <= 0)
+            {
+                throw new ArgumentNullException("cipherText");
+            }
+            if (key == null || key.Length <= 0)
+            {
+                throw new ArgumentNullException("key");
+            }
+            if (iv == null || iv.Length <= 0)
+            {
+                throw new ArgumentNullException("key");
+            }
+
+            // Declare the string used to hold
+            // the decrypted text.
+            string plaintext = null;
+
+            // Create an RijndaelManaged object
+            // with the specified key and IV.
+            using (var rijAlg = new RijndaelManaged())
+            {
+                //Settings
+                rijAlg.Mode = CipherMode.CBC;
+                rijAlg.Padding = PaddingMode.PKCS7;
+                rijAlg.FeedbackSize = 128;
+                rijAlg.Key = key;
+                rijAlg.IV = iv;
+
+                // Create a decrytor to perform the stream transform.
+                var decryptor = rijAlg.CreateDecryptor(rijAlg.Key, rijAlg.IV);
+
+                try
+                {
+                    // Create the streams used for decryption.
+                    using (var msDecrypt = new MemoryStream(encrypted))
+                    {
+                        using (var csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                        {
+                            using (var srDecrypt = new StreamReader(csDecrypt))
+                            {
+                                // Read the decrypted bytes from the decrypting stream
+                                // and place them in a string.
+                                plaintext = srDecrypt.ReadToEnd();
+                            }
+                        }
+                    }
+                }
+                catch
+                {
+                    plaintext = "keyError";
+                }
+            }
+            return plaintext;
+        }
+
+        public bool ValidateEmail(String email)
+        {
+            Regex emailRegex = new Regex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+            return emailRegex.IsMatch(email);
+        }
+
+        public string GenerateIdByDigit(int digit, int Id)
+        {
+            string generatedId = "0";
+            if (digit > 0 && Id > 0)
+            {
+                int digitCount = CountDigit(Id);
+                if (digitCount > 0)
+                {
+                    //digit = digit - digitCount;
+                    string digitvalue = "{0:D" + digit + "}";
+                    generatedId = string.Format(digitvalue, Id);
+                }
+            }
+            return generatedId;
+        }
+
+        private int CountDigit(int number)
+        {
+            int count = 0;
+            while (number > 0)
+            {
+                number = number / 10;
+                count++;
+            }
+            return count;
+        }
+
+        public string GetRootPath()
+        {
+            string ServerDomain = _httpContextAccessor.HttpContext.Request.Host.Value;
+            var FileBaseURL = _configuration["FileBaseURL"].ToString();
+            return !string.IsNullOrWhiteSpace(ServerDomain) ? ServerDomain : !string.IsNullOrWhiteSpace(FileBaseURL) ? FileBaseURL : _hostingEnvironment.ContentRootPath;
+        }
+
+        public string GetMimeType(string fileName)
+        {
+            string mimeType = "application/unknown";
+            string ext = Path.GetExtension(fileName).ToLower();
+            Microsoft.Win32.RegistryKey regKey = Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(ext);
+            if (regKey != null && regKey.GetValue("Content Type") != null)
+                mimeType = regKey.GetValue("Content Type").ToString();
+
+            mimeType = "data:" + mimeType + ";base64,";
+            return mimeType;
+        }
+
+        public async Task<bool> SendNotificationAsync(NotificationReqDTO notificationReqDTO)
+        {
+            bool sendNotification = false;
+            if (notificationReqDTO.IsAndroiodDevice)
+            {
+                //FCM Sender(Android Device)
+                FcmSettings settings = new FcmSettings()
+                {
+                    SenderId = _fcmNotificationSetting.SenderId,
+                    ServerKey = _fcmNotificationSetting.ServerKey
+                };
+                HttpClient httpClient = new HttpClient();
+                string authorizationKey = string.Format("keyy={0}", settings.ServerKey);
+                string deviceToken = notificationReqDTO.DeviceId;
+                httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", authorizationKey);
+                httpClient.DefaultRequestHeaders.Accept
+                        .Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                DataPayload dataPayload = new DataPayload();
+                dataPayload.Title = notificationReqDTO.Title;
+                dataPayload.Body = notificationReqDTO.Body;
+                GoogleNotificationReqDTO notification = new GoogleNotificationReqDTO();
+                notification.Data = dataPayload;
+                notification.Notification = dataPayload;
+                var fcm = new FcmSender(settings, httpClient);
+                var fcmSendResponse = await fcm.SendAsync(deviceToken, notification);
+                /*FcmSettings settings = new FcmSettings()
+                {
+                    SenderId = _fcmNotificationSetting.SenderId,
+                    ServerKey = _fcmNotificationSetting.ServerKey
+                };
+                HttpClient httpClient = new HttpClient();
+
+                string authorizationKey = string.Format("keyy={0}", settings.ServerKey);
+                string deviceToken = notificationReqDTO.DeviceId;
+
+                httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", authorizationKey);
+                httpClient.DefaultRequestHeaders.Accept
+                        .Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                DataPayload dataPayload = new DataPayload();
+                dataPayload.Title = notificationReqDTO.Title;
+                dataPayload.Body = notificationReqDTO.Body;
+
+                GoogleNotificationReqDTO notification = new GoogleNotificationReqDTO();
+                notification.Data = dataPayload;
+                notification.Notification = dataPayload;
+
+                var fcm = new FcmSender(settings, httpClient);
+                var fcmSendResponse = await fcm.SendAsync(deviceToken, notification);*/
+
+                if (fcmSendResponse.IsSuccess())
+                {
+                    sendNotification = true;
+                }
+                else
+                {
+                    sendNotification = false;
+                }
+            }
+            else
+            {
+                //Code here for APN Sender (iOS Device) 
+                //var apn = new ApnSender(apnSettings, httpClient);
+                //await apn.SendAsync(notification, deviceToken);
+            }
+            return sendNotification;
+        }
+
+        public bool SaveImage(string ImgStr, string ImgName)
+        {
+            //String path = HttpContext.Current.Server.MapPath("~/ImageStorage"); //Path
+
+            ////Check if directory exist
+            //if (!System.IO.Directory.Exists(path))
+            //{
+            //    System.IO.Directory.CreateDirectory(path); //Create directory if it doesn't exist
+            //}
+
+            //string imageName = ImgName + ".jpg";
+
+            ////set the image path
+            //string imgPath = Path.Combine(path, imageName);
+
+            //byte[] imageBytes = Convert.FromBase64String(ImgStr);
+
+            //File.WriteAllBytes(imgPath, imageBytes);
+
+            return true;
+        }
+
+        public string TodaysBirthDayList(DateTime dateTime)
+        {
+            DateTime birthDate = Convert.ToDateTime(dateTime);
+            int age = (int)Math.Floor((GetCurrentDateTime() - birthDate).TotalDays / 365.25D);
+            return age.ToString();
+        }
+
+        public DateTime TodaysConvertDate(string dateTime)
+        {
+            string iString = dateTime.ToString();
+            string convertedDate = Convert.ToDateTime(iString).ToString("yyyy-MM-dd");
+            DateTime oDate = DateTime.ParseExact(convertedDate, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+
+            return oDate;
+        }
+
+        public string GetFormatedInt(int value)
+        {
+            string formatedInt = Convert.ToString(value);
+            if (value > 0)
+            {
+                formatedInt = value.ToString("#,##0");
+            }
+            return formatedInt;
+        }
+
+        public string GetFormatedDecimal(decimal value)
+        {
+            string formatedDecimal = Convert.ToString(value);
+            formatedDecimal = value > 0 ? Convert.ToString(TruncateDecimal(value, 2)) : value.ToString("#,##0.00");
+            return formatedDecimal;
+        }
+
+        public CommonResponse UploadBase64File(string FileName, string Base64File, string ClientAccNo, int AccessCategoryId)
+        {
+            CommonResponse response = new CommonResponse();
+            try
+            {
+                if (Base64File != null)
+                {
+                    string FileExt = Path.GetExtension(Base64File).ToLower();
+
+                    string SubDirectoryPath = "";
+                    var fileext = FileName.Split('.');
+                    string fileExtension = fileext.Last();
+
+                    if (fileExtension.ToLower() == "jpg" || fileExtension.ToLower() == "jpeg" || fileExtension.ToLower() == "png")
+                    {
+                        SubDirectoryPath = AccessCategoryId == 3 ? Path.Combine(SubDirectoryPath, "IFA") : AccessCategoryId == 2 ? Path.Combine(SubDirectoryPath, "Client") : Path.Combine(SubDirectoryPath, "Other");
+                        //SubDirectoryPath = AccessCategoryId == 3 ? Path.Combine(SubDirectoryPath, "IFA") : Path.Combine(SubDirectoryPath, "Client");
+
+                        SubDirectoryPath = Path.Combine(SubDirectoryPath, ClientAccNo);
+                        //SubDirectoryPath = Path.Combine(SubDirectoryPath, "Images");
+                    }
+                    else
+                    {
+                        SubDirectoryPath = AccessCategoryId == 3 ? Path.Combine(SubDirectoryPath, "IFA") : AccessCategoryId == 2 ? Path.Combine(SubDirectoryPath, "Client") : Path.Combine(SubDirectoryPath, "Other");
+                        SubDirectoryPath = Path.Combine(SubDirectoryPath, ClientAccNo);
+                        TextInfo myTI = new CultureInfo("en-US", false).TextInfo;
+                        //SubDirectoryPath = Path.Combine(SubDirectoryPath, myTI.ToTitleCase(fileext[1]));
+                    }
+
+                    FileName = GetCurrentDateTime().Ticks + "." + fileext[1];
+                    var response2 = UploadFile(Base64File, SubDirectoryPath, FileName);
+                    if (response2.Status)
+                    {
+                        string FullPath = response2.Data;
+                        response.Data = FullPath;
+                        response.Status = true;
+                        response.StatusCode = HttpStatusCode.OK;
+                        response.Message = "File Created!";
+                    }
+                    else
+                    {
+                        response.Status = false;
+                        response.Message = "File Can Not Created!";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.Status = false;
+                response.Data = ex.Data;
+            }
+            return response;
+        }
+
+        public async Task AddActivityLog(dynamic context, dynamic request, dynamic requestResult)
+        {
+            try
+            {
+                var requestData = context.HttpContext.Request;
+
+                ActivityLogMst activityLog = new ActivityLogMst();
+                activityLog.Apiurl = requestData.Path;
+                activityLog.MethodType = requestData.Method;
+                activityLog.Request = requestResult;
+                activityLog.Response = request;
+                activityLog.ExecutionDate = GetCurrentDateTime();
+
+                await _dbContext.ActivityLogMsts.AddAsync(activityLog);
+                _dbContext.SaveChanges();
+            }
+            catch (Exception) { }
+        }
+
+        public string GetBase64FromFile(string filePath, string fileName)
+        {
+            string base64 = filePath;
+            try
+            {
+                WebClient webClient = new WebClient();
+                var fileByteArray = webClient.DownloadData(filePath);
+                base64 = Convert.ToBase64String(fileByteArray);
+
+                string mimeType = GetMimeType(fileName);
+                base64 = mimeType + base64;
+            }
+            catch (Exception) { }
+            return base64;
+        }
+
+        public CommonResponse GetConvertedCurrency(string From, string To, double Amount, DateTime? Date)
+        {
+            /*
+                Sample Success Response
+                -----------------------
+                   {
+                       "success": true,
+                       "query": {
+                       "from": "ZAR",
+                       "to": "USD",
+                       "amount": 5
+                   },
+                       "info": {
+                       "timestamp": 1667366464,
+                       "rate": 0.055359
+                   },
+                   "date": "2022-11-02",
+                   "result": 0.276795
+                   }
+                */
+
+            CommonResponse commonResponse = new CommonResponse();
+            try
+            {
+                commonResponse.Data = Amount;
+                bool FixerCurrencyConversionSwitch = Convert.ToBoolean(_configuration.GetSection("ThirdPartyAPI:FixerCurrencyConversionSwitch").Value);
+                if (FixerCurrencyConversionSwitch)
+                {
+                    string FixerCurrencyConversionBaseURL = _configuration.GetSection("ThirdPartyAPI:FixerCurrencyConversionBaseURL").Value;
+                    string APIKey = _configuration.GetSection("ThirdPartyAPI:FixerAPIKey").Value;
+
+                    var Parameters = "?to=" + To + "&from=" + From + "&amount=" + Amount;
+                    var URL = FixerCurrencyConversionBaseURL + Parameters;
+
+                    using (var httpClient = new HttpClient())
+                    {
+                        using (var request = new HttpRequestMessage(new HttpMethod("GET"), URL))
+                        {
+                            request.Headers.TryAddWithoutValidation("apikey", APIKey);
+
+                            var response = httpClient.Send(request);
+                            if (response.StatusCode == HttpStatusCode.OK)
+                            {
+                                var res = response.Content.ReadAsStringAsync().Result;
+                                var model = JsonConvert.DeserializeObject<dynamic>(res);
+                                if (model != null && model.success == true)
+                                {
+                                    commonResponse.Data = model.result;
+                                    commonResponse.StatusCode = HttpStatusCode.OK;
+                                    commonResponse.Status = true;
+                                    commonResponse.Message = "Success.";
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    commonResponse.StatusCode = HttpStatusCode.OK;
+                    commonResponse.Status = true;
+                    commonResponse.Message = "Success.";
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return commonResponse;
+        }
+
+        public string GetFormatedDouble(double value)
+        {
+            string formatedDouble = Convert.ToString(value);
+            if (value > 0)
+            {
+                formatedDouble = value.ToString("#,##0.00");
+            }
+            return formatedDouble;
+        }
+
+        public DateTime GetCurrentDateTime()
+        {
+            return DateTime.Now;
+        }
+
+        public DateTime GetLastDateOfMonth(int Year, int Month)
+        {
+            DateTime LastDateOfMonth = new DateTime(Year, Month, DateTime.DaysInMonth(Year, Month));
+            return LastDateOfMonth;
+        }
+
+        public DateTime GetStartDateOfMonth(int Year, int Month)
+        {
+            DateTime StartDateOfMonth = new DateTime(Year, Month, 1);
+            return StartDateOfMonth;
+        }
+
+        public decimal TruncateDecimal(decimal value, int precision)
+        {
+            decimal step = (decimal)Math.Pow(10, precision);
+            decimal tmp = Math.Truncate(step * value);
+            return tmp / step;
+        }
+
+        public string GetEnumWiseFormattedRole(string RoleName)
+        {
+            string roleName = string.Empty;
+            foreach (var item in RoleName.Split(" "))
+            {
+                if (!string.IsNullOrEmpty(item))
+                {
+                    roleName += string.IsNullOrEmpty(roleName) ? char.ToUpper(item[0]) + item.Substring(1) : "_" + char.ToUpper(item[0]) + item.Substring(1);
+                }
+                else
+                {
+                    break;
+                }
+            }
+            return roleName;
+        }
+
+        public string GetUpperCaseFirstAll(string value)
+        {
+            return value != null ? Regex.Replace(value, @"(^\w)|(\s\w)", m => m.Value.ToUpper()) : string.Empty;
+        }
+        public string GetFormattedKeyName(string key)
+        {
+            if (key != null)
+            {
+                key = GetUpperCaseFirstAll(key);
+                key = key.Substring(0, 1).ToLower() + key.Substring(1);
+                key = key.Replace(" ", string.Empty);
+            }
+            else { key = string.Empty; }
+
+            return key;
+        }
+
+        public async Task AddActivityLogUpdated(dynamic apiUrl, dynamic methodType, dynamic request, dynamic requestResult)
+        {
+            try
+            {
+                //var requestData = context.HttpContext.Request;
+
+                ActivityLogMst activityLog = new ActivityLogMst();
+                activityLog.Apiurl = apiUrl;
+                activityLog.MethodType = methodType;
+                //activityLog.Apiurl = requestData.Path;
+                //activityLog.MethodType = requestData.Method;
+                activityLog.Request = requestResult;
+                activityLog.Response = request;
+                activityLog.ExecutionDate = GetCurrentDateTime();
+
+                await _dbContext.ActivityLogMsts.AddAsync(activityLog);
+                _dbContext.SaveChanges();
+            }
+            catch (Exception) { }
+        }
+        public string GetFormatedDecimalWithRounfOff(decimal value)
+        {
+            string formatedDecimal = Convert.ToString(value);
+            formatedDecimal = value > 0 ? value.ToString("0.00") : value.ToString("0.00");
+            return formatedDecimal;
+        }
+    }
+}
