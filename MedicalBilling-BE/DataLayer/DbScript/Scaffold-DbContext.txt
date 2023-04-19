@@ -1,0 +1,29 @@
+Read Me
+
+=======================================
+Install Nuget Before Run This Command :
+=======================================
+Microsoft.EntityFrameworkCore
+Microsoft.EntityFrameworkCore.SqlServer
+Microsoft.EntityFrameworkCore.Design
+Microsoft.EntityFrameworkCore.Tools
+=======================================
+
+1. Scaffold-DbContext to update DB models from latest DB
+
+
+Scaffold-DbContext "Server=192.168.1.199,1433;user=sa;password=sa@2022;Database=MedicalBillingDB;Encrypt=False;Trusted_Connection=false;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Entities  -Tables AppointmentMst, CallTypeMst, ClientMst, DurationMst, ExtensionMst, PhysicianMst, RemarkMst, UserMst,UserTokenMst,ActivityLogMst -Force
+
+
+Scaffold-DbContext "Server=192.168.1.199,1433;user=sa;password=sa@2022;Database=MedicalBillingDB;Encrypt=False;Trusted_Connection=false;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Entities  -Tables AppointmentMst, CallTypeMst, ClientMst, DurationMst, ExtensionMst, PhysicianMst, RemarkMst, UserMst,UserTokenMst,ActivityLogMst,PatientEmailMst,RoleMst -Force
+
+Scaffold-DbContext "Server=192.168.1.199,1433;user=sa;password=sa@2022;Database=MedicalBillingDB;Encrypt=False;Trusted_Connection=false;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Entities  -Tables AppointmentMst, CallTypeMst, ClientMst, DurationMst, ExtensionMst, PhysicianMst, RemarkMst, UserMst,UserTokenMst,ActivityLogMst,PatientEmailMst,RoleMst,NotificationMst -Force
+
+
+
+
+    
+
+
+
+
