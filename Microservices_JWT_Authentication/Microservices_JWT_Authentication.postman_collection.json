@@ -1,0 +1,107 @@
+{
+	"info": {
+		"_postman_id": "ae0eb716-9f09-4a0d-8f52-658c381eed98",
+		"name": "Microservices_JWT_Authentication",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "https://localhost:5001/WeatherForecast",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6ImpvaG4uZG9lIiwiYXVkIjpbImFwaS51c2Vyc2VydmljZS5jb20iLCJhcGkuZ2F0ZXdheS5jb20iLCJhcGkuYXV0aHNlcnZpY2VzLmNvbSJdLCJuYmYiOjE2ODAyNjE4MjEsImV4cCI6MTY4MDI2MTg1MSwiaXNzIjoiYXBpLmF1dGhzZXJ2aWNlcy5jb20ifQ.WUbhbkHHvcsuWIA0mYPwqWCQS1LU3c1BvU-Rl5kQ0Y0",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5001/WeatherForecast",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"WeatherForecast"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "https://localhost:5001/Users",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6ImpvaG4uZG9lIiwiYXVkIjpbImFwaS51c2Vyc2VydmljZS5jb20iLCJhcGkuZ2F0ZXdheS5jb20iLCJhcGkuYXV0aHNlcnZpY2VzLmNvbSJdLCJuYmYiOjE2ODAyNjYzOTgsImV4cCI6MTY4MDI2NjQyOCwiaXNzIjoiYXBpLmF1dGhzZXJ2aWNlcy5jb20ifQ.iX2NhApQLmhH649Ady77owpan1hZVydvxKVUhgF2OTI",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"url": {
+					"raw": "https://localhost:5001/Users",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"Users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "https://localhost:5001/Login",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userName\": \"john.doe\",\r\n    \"password\": \"123456\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5001/Login",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"Login"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
