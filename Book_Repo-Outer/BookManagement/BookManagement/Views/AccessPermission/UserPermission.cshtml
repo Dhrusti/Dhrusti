@@ -1,0 +1,196 @@
+﻿@inject IHttpContextAccessor HttpContextAccessor
+@model DTOs.UserAccessPermissionDTO
+@{
+	bool IsLoggedIn = false;
+	var user = HttpContextAccessor.HttpContext.Session.GetObject<UserMstModel>("User");
+
+	if (user != null)
+	{
+		IsLoggedIn = true;
+	}
+	if (IsLoggedIn)
+	{
+
+	}
+	else
+	{
+		Context.Response.Redirect("/Authentication/LogOut");
+	}
+}
+
+
+
+
+<style>
+	.cnlbtn {
+		width: auto;
+		padding: 10px 18px;
+		background-color: #bf0d0d;
+		border-radius: 1px;
+	}
+
+	.savebtn {
+		width: auto;
+		padding: 10px 18px;
+		background-color: #008CBA;
+		border-radius: 1px;
+	}
+		.btn {
+		color : #000000;
+	}
+</style>
+
+<div>
+	<input type="hidden" class="form-control" id="userid" name="userid" value="@Model.userMstDTO.UserId" />
+</div>
+
+
+
+<br />
+<table class="table">
+	<thead>
+		<tr>
+			<td><b>Permissions</b></td>
+
+			@foreach (var accessitem in Model.accessDTO)
+			{
+				<td>@accessitem.AccessName</td>
+			}
+
+		</tr>
+	</thead>
+	<tbody>
+
+		@foreach (var peritem in Model.permissionDTO)
+		{
+			<tr>
+				<td>@peritem.PermissionName</td>
+				@foreach (var accessitem in Model.accessDTO)
+				{
+					if (accessitem.AccessId == 4)
+					{
+				
+							<td><input class="chk-permission" type="checkbox" PermissionId="@peritem.Pid" AccessId="@accessitem.AccessId" UserId="@Model.userMstDTO.UserId" id="txtadd" name="txtadd" value="Add" checked disabled/></td>
+
+					}
+					else
+					{
+						var userpermission = Model.userPermissionDTO.FirstOrDefault(x => x.Permissionid == peritem.Pid && x.AccessId == accessitem.AccessId && x.UserId == Model.userMstDTO.UserId);
+						if (userpermission != null)
+						{
+
+							<td><input class="chk-permission" type="checkbox" PermissionId="@peritem.Pid" AccessId="@accessitem.AccessId" UserId="@Model.userMstDTO.UserId" id="txtadd" name="txtadd" value="Add" checked /></td>
+
+
+						}
+						else
+						{
+							<td><input class="chk-permission" type="checkbox" PermissionId="@peritem.Pid" AccessId="@accessitem.AccessId" UserId="@Model.userMstDTO.UserId" id="txtadd" name="txtadd" value="Add" /></td>
+						}
+					}
+				}
+
+			</tr>
+		}
+
+	</tbody>
+
+</table>
+
+<button class="btn savebtn" id="btnsavepermission" type="button">Save</button>
+<button class="btn cnlbtn" id="btncancelpermission" type="button">Cancel</button>
+@*<button asp-controller="Authentication" asp-action="GetAllUsers" class="btn btn-primary" type="button">Cancel</button>*@
+<h5 style="color:red">@ViewBag.message</h5>
+
+
+@section Scripts
+	{
+	<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script type="text/javascript">
+
+		//var Toast = Swal.mixin({
+		//          toast: true,
+		//          //showCancelButton: true,
+		//          position: 'top-end',
+		//          showConfirmButton: true,
+		//          //timer: 7000
+		//      });
+		$(document).ready(function() {
+
+			$("#btnsavepermission").click(function() {
+				var datasave = [];
+				$(".chk-permission").each(function(index, value) {
+					if ($(this).prop('checked') == true) {
+						var userid = parseInt($(this).attr('UserId'));
+						var permissionid = parseInt($(this).attr('PermissionId'));
+						var accessid = parseInt($(this).attr('AccessId'));
+						datasave.push({
+							"UserId": userid,
+							"Permissionid": permissionid,
+							"AccessId": accessid
+						});
+					}
+				});
+
+				console.log(JSON.stringify(datasave));
+				debugger;
+				Swal.fire({
+					title: "Are you sure want to update ?",
+					text: "You won't be able to revert this!",
+					icon: 'warning',
+					showCancelButton: true,
+					confirmButtonColor: '#3085d6',
+					cancelButtonColor: '#d33',
+					confirmButtonText: 'Yes, update it!'
+				}).then((result) => {
+					if (result.isConfirmed) {
+
+						$.ajax({
+							url: "/AccessPermission/SaveUserPermission",
+							type: "POST",
+							data: JSON.stringify(datasave),
+							dataType: "json",
+							contentType: 'application/json; charset=utf-8',
+
+							success: function(response) {
+								console.log(response);
+								debugger;
+								Swal.fire({
+									title: "Changes Saved...!!!",
+									text: "Saved...!!!",
+									icon: 'success',
+									showCancelButton: false,
+									confirmButtonColor: '#3085d6',
+									cancelButtonColor: '#d33',
+									confirmButtonText: response.message,
+								}).then((result) => {
+									if (result.isConfirmed) {
+										window.location = "/GetAllUsers";
+									}
+								})
+							},
+							error: function(er) {
+
+								console.log(er);
+							}
+
+						});
+					}
+				})
+			});
+
+			$("#btncancelpermission").click(function() {
+				//window.location.replace("GetAllUsers");
+				//var base_url = window.location.origin;
+				window.location.href = "../GetAllUsers";
+			});
+
+		});
+	</script>
+}
+
+
+
+
+
+

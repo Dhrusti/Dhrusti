@@ -1,0 +1,128 @@
+﻿@model IEnumerable<BookViewModel>
+@{
+	ViewData["Title"] = "ViewBook";
+	//BookListViewModel model = ViewBag.data;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>About Us</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+	<style type="text/css">
+		.divClip {
+			width: 180px;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		div.a {
+			width: 250px;
+			color: black;
+			height: 2em;
+			line-height: 1em;
+			font-size: 25px;
+			font-weight: 400;
+			text-overflow: ellipsis;
+			margin-bottom: 12px;
+			cursor: pointer;
+			word-break: break-all;
+			overflow: hidden;
+			white-space: nowrap;
+		}
+
+			div.a:hover {
+				overflow: visible;
+				white-space: normal;
+			}
+	</style>
+</head>
+<br />
+
+<div class="form-group">
+	<div>
+		@Html.Label("CategoryName")
+		<div>
+			@Html.DropDownList("CategoryId", new SelectList(@ViewBag.categoryList, "Value", "Text"), "Select Category", htmlAttributes: new { @class = "form-control LoadBooks" })
+			<br />
+		</div>
+	</div>
+</div>
+<div class="form-group">
+	<div>
+		@Html.Label("SubCategoryName")
+		<div>
+			<select id="SubCategoryId" name="SubCategoryId" class="form-control">
+				<option>-- Select --</option>
+			</select>
+			@*@Html.DropDownList("SubCategoryId",  new SelectList(@ViewBag.subcategoryList, "Value", "Text"), "Select SubCategory", htmlAttributes: new { @class = "form-control LoadBooks", @disabled = "disabled" })*@
+			<br />
+		</div>
+	</div>
+</div>
+
+
+<div class="book">
+	<div class="jumbotron">
+		<div id="divbooks">
+
+		</div>
+	</div>
+</div>
+
+<br />
+<br />
+
+</html>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+@section Scripts {
+	<script>
+		$("#CategoryId").change(function() {
+			loadsubcatbycat();
+		});
+
+		$("#SubCategoryId").change(function() {
+			var Catid = $("#CategoryId").val();
+			var SubCatid = $("#SubCategoryId").val();
+			loadbooks(Catid, SubCatid);
+		});
+
+
+		function loadsubcatbycat() {
+			$("#SubCategoryId").removeAttr("disabled");
+			var subcategory = $('#CategoryId').val();
+			$.ajax({
+				url: "/Home/BooksIndex2?id=" + subcategory,
+				//url:"getdata.php?timestamp="+timestamp+"uid="+id+"uname="+name,
+				type: "GET",
+				success: function(res) {
+					$("#SubCategoryId").html("");
+					var list = $("#SubCategoryId");
+					$.each(res, function(index, item) {
+						list.append(new Option(item.text, item.value));
+					});
+					var Catid = $("#CategoryId").val();
+					var SubCatid = $("#SubCategoryId").val();
+					loadbooks(Catid, SubCatid);
+				}
+			});
+		}
+
+		function loadbooks(Catid, SubCatid) {
+			$.ajax({
+				url: "/Home/BooksDetails?catid=" + Catid + "&subcatid=" + SubCatid,
+				type: "GET",
+				success: function(data) {
+					debugger;
+					$("#divbooks").html(data);
+				}
+			});
+		}
+	</script>
+}

@@ -1,0 +1,115 @@
+﻿@inject IHttpContextAccessor HttpContextAccessor
+@model BookManagement.Models.BookDownloadModel
+@{
+    ViewData["Title"] = "ViewBook";
+    bool IsLoggedIn = false;
+    var user = HttpContextAccessor.HttpContext.Session.GetObject<UserMstModel>("User");
+    if (user != null)
+    {
+        IsLoggedIn = true;
+    }
+}
+
+
+@*<h3>Please Enter your details</h3>*@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>About Us</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<br />
+<body>
+
+    <div class="jumbotron">
+        <div>
+            <h3>Book:  @Html.DisplayName(@Model.BookName)</h3>
+            <hr />
+        </div>
+
+        <div style="display:flex"><img src="~/Images/@Model.coverimage" alt="photo" height="400px" width="300px" /></div>
+        <div class="col-md-12">
+            <div class="col-md-3">
+                <h4><b>Author:-  @Html.DisplayName(@Model.AuthorName)</b></h4>
+            </div>
+            <div class="col-md-3">
+                <h4><b>Price:-  @Html.DisplayName(@Model.price.ToString())</b></h4>
+            </div>
+            <div class="col-md-3">
+                <h4><b>Publication:-  @Html.DisplayName(@Model.Publisher)</b></h4>
+            </div>
+            @if (IsLoggedIn)
+            {
+                @*@Html.BeginForm("DownloadBook","Home",FormMethod.Post)
+                {*@
+                    <form id="userform">
+                        <input hidden asp-for="BookId" />
+                        <input hidden asp-for="BookName" />
+                        <input hidden asp-for="AuthorName" />
+                        <input hidden asp-for="Publisher" />
+                        <input hidden asp-for="price" />
+                        <input hidden asp-for="FirstName" />
+                        <input hidden asp-for="LastNane" />
+                        <input hidden asp-for="EmailId" />
+                        <input hidden asp-for="ContactNumber" />
+                        <input hidden asp-for="Location" />
+                        <input hidden asp-for="pdfpath" />
+                        @*<button id="downloadbtn" class="btn btn-success">Download</button>*@
+                        <div class="col-md-3">
+                            <span class="float-end"><a class="btn btn-success" id="downloadbtn">Download</a></span>
+                            @*<span class="float-end"> <a asp-action="DownloadBook" asp-route-id=@Model.BookId class="btn btn-success" style="float:right;">Download</a></span>*@
+                        </div>
+                    </form>
+                @*}*@
+            }
+            else
+            {
+                <div class="col-md-3">
+                    <span class="float-end"> <a asp-action="DownloadBook" asp-route-id=@Model.BookId class="btn btn-success" style="float:right;">Download</a></span>
+                </div>
+            }
+
+        </div>
+    </div>
+    <br />
+    <br />
+
+</body>
+
+</html>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+@*<script src="~/js/Validation.js"></script>*@
+<script type="text/javascript">
+    $(document).ready(function(){
+
+       $("#downloadbtn").click(function(){
+           var employee =$("#userform").serialize();
+
+           $.ajax({
+               url: '/Home/DownloadBook',
+               type: "POST",
+               dataType: "JSON",
+               //contentType: "application/json; charset=utf-8",
+               data: employee,
+               success: function (json) {
+                   if (json.isRedirect) {
+                       alert("Thanks For Downloading the Book...!!!");
+                       window.open("../../Files/" + json.returnmodel, "blank");
+
+                       window.location.href = json.redirectUrl;
+
+                   }
+               },
+               error: function (json) {
+                   alert("Error");
+
+                   console.log("error");
+               }
+           });
+           });
+      });
+</script>

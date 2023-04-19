@@ -1,0 +1,110 @@
+﻿@model IEnumerable<ReportModel>
+@{
+    ViewData["Title"] = "HomePage";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Bootstrap Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <style>
+        .images {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 30px;
+        }
+
+        .photo {
+            max-width: max-content;
+            padding: 0 10px;
+            height: 200px;
+        }
+
+            .photo img {
+                width: 100%;
+                height: 100%;
+            }
+
+        .divClip {
+            width: 180px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        div.a {
+            width: 200px;
+            color: black;
+            height: 2em;
+            line-height: 1em;
+            font-size: 25px;
+            font-weight: 400;
+            text-overflow: ellipsis;
+            margin-bottom: 12px;
+            cursor: pointer;
+            word-break: break-all;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+            div.a:hover {
+                overflow: visible;
+                white-space: normal;
+            }
+
+        
+    </style>
+</head>
+@*<h1>HomePage</h1>*@
+<body style="background-color:#F8F9F9">
+    <div class="text-center">
+        <h3 class="display-4">Book Store</h3>
+    </div>
+
+    <div class="container">
+        <div class="jumbotron" style="background-color:#D5F5E3 ">
+            <div class="text-center"> <h2>New Added Collections</h2></div>
+            <div class="row">
+
+                @foreach (var item in Model)
+                {
+                    <div class="col-md-3">
+                        <div class="alert alert-success" role="alert">
+                            <img src="~/Images/@item.CoverImagePath" alt="@item.CoverImagePath" height="200px" width="200px" id="imgDisplay" />                            
+                            <div class="a"><h3 style="text-overflow:ellipsis">@item.BookName</h3></div>
+                            <br />
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="jumbotron" style="background-color:#D1F2EB ">
+            <div class="text-center"> <h2>Most Sells Books</h2></div>
+            <div class="row">
+                @foreach (var item in Model)
+                {
+                    if (item.DownloadCount > 0)
+                    {
+                        <div class="col-md-3">
+                            <div class="alert alert-success" role="alert">
+                                <img src="~/Images/@item.CoverImagePath" alt="@item.CoverImagePath" height="200px" width="200px" id="imgDisplay" />
+                                <div class="a"><h3>@item.BookName</h3></div>
+                                <br />
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+    <br />
+    <br />
+</body>
+
+</html>

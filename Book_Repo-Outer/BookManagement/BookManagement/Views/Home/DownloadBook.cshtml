@@ -1,0 +1,102 @@
+﻿@inject IHttpContextAccessor HttpContextAccessor
+@model BookManagement.Models.BookDownloadModel
+@{
+    ViewData["Title"] = "DownloadBook";
+    bool IsLoggedIn = false;
+	var user = HttpContextAccessor.HttpContext.Session.GetObject<UserMstModel>("User");
+
+	if (user != null)
+	{
+		IsLoggedIn = true;
+	}
+}
+
+<style>
+    .error {
+        display: none;
+        margin-left: 10px;
+    }
+
+    .error_show {
+        color: red;
+        margin-left: 10px;
+    }
+</style>
+<div class="row" style="background-color:#F8F9F9">
+    <div class="col-md-6" style="background-color:#C0C0C0">
+        <br />
+        <br />
+        <div class="float-left">
+            <div>
+                <div class="row"><b><h5>Book Name: </h5>@Model.BookName</b></div>
+                <br />
+                <div class="row"><b><h5>Book Author: </h5>@Model.AuthorName</b></div>
+                <br />
+                <div class="row"><b><h5>Publisher: </h5>@Model.Publisher</b></div>
+                <br />
+                <div class="row"><b><h5>Price: </h5>@Model.price</b></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6" style="background-color:#999999">
+        <div class="float-right">
+            <div asp-validation-summary="ModelOnly" class="error"></div>
+            <form id="userform">
+                <input hidden asp-for="BookId" />
+                <input hidden asp-for="BookName" />
+                <input hidden asp-for="AuthorName" />
+                <input hidden asp-for="Publisher" />
+                <input hidden asp-for="price" />
+                <input hidden asp-for="pdfpath" />
+                <br />
+                <div class="form-group">
+                    <label asp-for="FirstName" class="control-label"></label>
+                    <input type="text" asp-for="FirstName" id="FName" name="FirstName" placeholder="Enter your First Name" class="form-control" required="required" autofocus />
+                    <span asp-validation-for="FirstName" class="error">This Field Required..</span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="LastNane" class="control-label"></label>
+                    <input type="text" asp-for="LastNane" id="Lname" placeholder="Enter your Last Name" class="form-control" required="required" />
+                    <span asp-validation-for="LastNane" class="error"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="EmailId" class="control-label"></label>
+                    @*<input type="email" class="form-control" id="mail" name="email" placeholder="Enter your Email" value="@Model.EmailId" required="required"/>*@
+                    <input type="email" asp-for="EmailId" id="mail" pattern="" placeholder="Enter your Email" class="form-control" pattern="/^[a-z0-9._%+-]+[a-z0-9.-]+\.[a-z]{2,4}$/" required="required" />
+                    <span asp-validation-for="EmailId" class="error"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="ContactNumber" class="control-label"></label>
+                    <input type="number" asp-for="ContactNumber" id="Cnt" placeholder="Enter your Mobile Number" class="form-control" required="required" />
+                    <span asp-validation-for="ContactNumber" class="error"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Location" class="control-label"></label>
+                    <input type="text" asp-for="Location" id="Loc" placeholder="Enter your Location" class="form-control" required="required" />
+                    <span asp-validation-for="Location" class="error"></span>
+                </div>
+                <br />
+                <div>
+                    @*<button id="downloadbtn" class="btn btn-success">Download</button>*@
+                    <a class="btn btn-success" id="downloadbtn" onclick="GEEKFORGEEKS();">Download</a>
+                    @if(user==null)
+                    {
+                        <a asp-action="BooksIndex" class="btn btn-danger">Cancel</a>
+                    }
+                    else
+                    {
+                        <a asp-action="BookIndex" asp-controller="Book" class="btn btn-danger">Cancel</a>
+                    }
+
+                </div>
+                @*</div>*@
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="~/js/Validation.js"></script>
+
+

@@ -1,0 +1,163 @@
+﻿@inject IHttpContextAccessor HttpContextAccessor
+@model BookManagement.Models.EditBookModel
+@{
+    ViewData["Title"] = "Updatebook";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    BookViewModel model = ViewBag.data;
+
+    bool IsLoggedIn = false;
+	var user = HttpContextAccessor.HttpContext.Session.GetObject<UserMstModel>("User");
+
+	if (user != null)
+	{
+		IsLoggedIn = true;
+	}
+	if (IsLoggedIn)
+	{
+         
+	}
+	else
+	{
+		Context.Response.Redirect("/Authentication/LogOut");
+	}
+
+}
+
+<style>
+	.cnlbtn {
+		width: auto;
+		padding: 10px 18px;
+		background-color: #bf0d0d;
+		border-radius: 1px;
+	}
+
+	.savebtn {
+		width: auto;
+		padding: 10px 18px;
+		background-color: #008CBA;
+		border-radius: 1px;
+	}
+    	.btn {
+		color : #000000;
+	}
+</style>
+
+
+<h1></h1>
+<div class="row">
+    <div class="col-md-4">
+        <form method="post" asp-action="Editbook" asp-controller="Book" enctype="multipart/form-data">
+            @*<div asp-validation-summary=ModelOnly class="alert-danger"></div>*@
+
+            <div class="form-group">
+                <input hidden asp-for="BookId" />
+            </div>
+            <div class="form-group">
+                <div>
+                    @Html.Label("CategoryName")
+                    <div>
+                        @Html.DropDownList("CategoryId", new SelectList(@ViewBag.categoryList, "Value", "Text"), "Select Category", htmlAttributes: new { @class = "form-control"  ,required="requierd"})
+                        <span asp-validation-for="CategoryId" class="alert-danger"></span>
+                        <br />
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div>
+                    @Html.Label("SubCategoryName")
+                    <div>
+
+                        @Html.DropDownList("SubCategoryId",  new SelectList(@ViewBag.subcategoryList, "Value", "Text"), "Select SubCategory", htmlAttributes: new { @class = "form-control",required="requierd" })
+                        <span asp-validation-for="SubCategoryId" class="alert-danger"></span>
+                        <br />
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="BookName" class="control-label"></label>
+                <input asp-for="BookName" class="form-control" required="requierd" />
+                <span asp-validation-for="BookName" class="alert-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AuthorName" class="control-label"></label>
+                <input asp-for="AuthorName" class="form-control" required="requierd" />
+                <span asp-validation-for="AuthorName" class="alert-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BookPages" class="control-label"></label>
+                <input  asp-for="BookPages" class="form-control" required="requierd"/>
+                <span asp-validation-for="BookPages" class="alert-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Publisher" class="control-label"></label>
+                <input asp-for="Publisher" class="form-control"required="requierd" />
+                <span asp-validation-for="Publisher" class="alert-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PublishDate" class="control-label"></label>
+                <input asp-for="PublishDate" class="form-control" required="requierd" />
+                <span asp-validation-for="PublishDate" class="alert-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Edition" class="control-label"></label>
+                <input asp-for="Edition" class="form-control" required="requierd" />
+                <span asp-validation-for="Edition" class="alert-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" required="requierd" />
+                <span asp-validation-for="Description" class="alert-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Price" class="control-label"></label>
+                <input maxlength="10" asp-for="Price"  class="form-control" required="requierd"/>
+                <span asp-validation-for="Price" class="alert-danger"></span>
+            </div>
+           @* <div class="form-group">
+                <label asp-for="CoverImagePath"></label>
+                <input asp-for="CoverImagePath" type="file" />
+                <span asp-validation-for="CoverImagePath" class="alert-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Pdfpath"></label>
+                <input type="file" asp-for="Pdfpath" />
+                <span asp-validation-for="Pdfpath" class="alert-danger"></span>
+            </div>*@
+            <div>
+                <input type="submit" method="post" asp-action="Editbook" asp-controller="Book" value="Update" class="btn savebtn" enctype="multipart/form-data" />
+                <a asp-action="BookIndex" class="btn cnlbtn">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+@section Scripts {
+<script>
+
+    $("#CategoryId").change(function(){
+         $("#SubCategoryId").removeAttr("disabled");
+         var subcategory = $('#CategoryId').val();
+        $.ajax({
+            url: "/Book/BooksIndex2?id="+subcategory,
+            type: "GET",
+            success: function (res) {
+                $("#SubCategoryId").html("");
+                  var list = $("#SubCategoryId");
+                  $.each(res, function(index, item) {
+                  list.append(new Option(item.text, item.value));
+
+                });
+              
+            }
+        });
+    });
+
+     $(document).ready(function(){
+          //$("#CategoryId").change();
+     });
+
+</script>
+}

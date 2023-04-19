@@ -1,0 +1,78 @@
+﻿@model IEnumerable<ReportModel>
+@{
+    ViewData["Title"] = "ReportIndex";
+    Layout = null;
+}
+
+<h1 style="margin:50px">Books Report</h1>
+
+<hr />
+@if (Model.Count() > 0 ||Model!=null)
+{
+
+    <table class="table-bordered" style="width:100%">
+        <thead style="background-color:wheat">
+            <tr>
+                <td>
+                    <b/>BookName
+                </td>
+                <td>
+                    <b/>AuthorName
+                </td>
+                <td>
+                    <b/>Book Category
+                </td>
+
+                <td>
+                    <b/>Book SubCategory
+                </td>
+                
+                <td>
+                    <b/>Edition
+                </td>
+
+                <td>
+                    <b/>BookPages
+                </td>
+
+                <td>
+                    <b/>DownloadCount
+                </td>
+            </tr>
+        </thead>
+        <tbody style="background-color:#F8F9F9">
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.BookName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.AuthorName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CategoryName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SubCategoryName)
+
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Edition)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.BookPages)
+                    </td>
+                    <td>
+                        <b>@Html.DisplayFor(modelItem => item.DownloadCount)</b>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <h3 class="alert-warning"> No Data Found...</h3>
+}
+

@@ -1,0 +1,206 @@
+﻿@inject IHttpContextAccessor HttpContextAccessor
+@model BookManagement.Models.UserMstModel
+@{
+
+
+	Layout = "LayoutHtml";
+
+
+	bool IsEditMode = false;
+	bool IsLoggedIn = false;
+	var user = HttpContextAccessor.HttpContext.Session.GetObject<UserMstModel>("User");
+	var userRoleList = HttpContextAccessor.HttpContext.Session.GetObject<List<UserPermissionModel>>("UserRoleList");
+
+	if (user != null)
+	{
+		IsLoggedIn = true;
+	}
+	if (IsLoggedIn)
+	{
+
+	}
+	else
+	{
+		Context.Response.Redirect("/Authentication/LogOut");
+	}
+
+
+	if (Model.UserId > 0)
+	{
+		IsEditMode = true;
+	}
+}
+
+<style>
+	.cnlbtn {
+		width: auto;
+		padding: 10px 18px;
+		background-color: #bf0d0d;
+		border-radius: 1px;
+	}
+
+	.savebtn {
+		width: auto;
+		padding: 10px 18px;
+		background-color: #008CBA;
+		border-radius: 1px;
+	}
+
+	.updatebtn {
+		width: auto;
+		padding: 10px 18px;
+		background-color: #008CBA;
+		border-radius: 1px;
+	}
+		.btn {
+		color : #000000;
+	}
+</style>
+
+
+<!-- Registeration Card -->
+<div class="card">
+	<div class="card-body">
+
+		@if (IsEditMode)
+		{
+
+			<h1>Update User Information</h1>
+		}
+		else
+		{
+			@if (IsLoggedIn)
+			{
+				<h1>Add User</h1>
+			}
+			else
+			{
+				<h1>Registration</h1>
+			}
+
+		}
+		<form id="registrationform" class=" mb-3" asp-controller="Authentication" asp-action="SaveUserReg" method="POST" new {onsubmit="ValidateUser();" }>
+			<div asp-validation-summary="ModelOnly" class="alert-danger"></div>
+
+			<div>
+				<input type="hidden" class="form-control" id="userid" name="userid" value="@Model.UserId" autofocus />
+			</div>
+			<div class="mb-3">
+				<label for="FullName" class="form-label"><b>FullName</b></label>
+				<input type="text" class="form-control" id="FullName" name="FullName" placeholder="Enter your FullName" value="@Model.FullName" required="required" autofocus />
+				<span asp-validation-for="FullName" class="alert-danger"></span>
+			</div>
+			<div class="mb-3">
+				<label for="email" class="form-label"><b>Email</b></label>
+
+				<input type="email" class="form-control" id="email" name="email" placeholder="Enter your Email" value="@Model.Email" required="required" />
+				<span asp-validation-for="Email" class="alert-danger"></span>
+			</div>
+			<div class="mb-3">
+				<label for="UserName" class="form-label"><b>UserName</b></label>
+				<input type="text" class="form-control" id="UserName" name="UserName" placeholder="Enter your UserName" value="@Model.UserName" required="required" />
+				<span asp-validation-for="UserName" class="alert-danger"></span>
+			</div>
+			<div class="mb-3">
+				<label for="Address" class="form-label"><b>Address</b></label>
+				<input type="text" class="form-control" id="Address" name="Address" placeholder="Enter your Address" value="@Model.Address" required="required" />
+				<span asp-validation-for="Address" class="alert-danger"></span>
+			</div>
+			<div class="mb-3">
+				<label for="ContactNumber" class="form-label"><b>Contact Number</b></label>
+				<input type="text" class="form-control" id="ContactNumber" name="ContactNumber" placeholder="Enter your Contact Number" pattern="[1-9]{1}[0-9]{9}" value="@Model.ContactNumber" />
+				@Html.ValidationMessageFor(x => x.ContactNumber, "Please enter Contact", new { @class = "text-   danger", style = "   display:none" })
+				<span asp-validation-for="ContactNumber" class="alert-danger"></span>
+			</div>
+			@if (IsEditMode)
+			{
+				<div class="mb-3 form-password-toggle" style="display : none;">
+					<label class="form-label" for="Password"><b>Password</b></label>
+					<div class="input-group input-group-merge">
+						<input type="password" id="Password" class="form-control" name="Password" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
+						   aria-describedby="password" value="@Model.Password" />
+						<span asp-validation-for="Password" class="alert-danger"></span>
+						<span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+					</div>
+				</div>
+			}
+			else
+			{
+				<div class="mb-3 form-password-toggle">
+					<label class="form-label" for="Password"><b>Password</b></label>
+					<div class="input-group input-group-merge">
+						<input type="password" id="Password" class="form-control" name="Password" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
+						   aria-describedby="password" required="required" />
+						<span asp-validation-for="Password" class="alert-danger"></span>
+						<span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+					</div>
+				</div>
+			}
+
+			
+				@if (IsEditMode)
+				{
+					<button id="btnsignup" asp-controller="Authentication" asp-action="UpdateUser" class="btn d-grid w-100 updatebtn">Update</button>
+				}
+				else
+				{
+					<button id="btnsignup" asp-controller="Authentication" asp-action="SaveUserReg" class="btn savebtn d-grid w-100 buttonsignup">Sign up</button>
+					@*<b style="color:red">@ViewBag.message</b>*@
+
+				}
+			
+				
+			
+
+
+		</form>
+
+		@*@if (IsEditMode)
+		{
+		<form><button asp-controller="Authentication" asp-action="Login" class="btn btn-primary d-grid w-100">Cancel</button></form>
+		}
+		else
+		{
+		<form><button asp-controller="Authentication" asp-action="Login" class="btn btn-primary d-grid w-100">Cancel</button></form>
+		<p class="text-center">
+		<span>Already have an account?</span>
+		<a href="~/Authentication/Login">
+		<span>Sign in instead</span>
+		</a>
+		</p>
+		}*@
+		<form><button asp-controller="Authentication" asp-action="GetAllUsers" class="btn cnlbtn d-grid w-100">Cancel</button></form>
+		<h6 style="color:red"><b>@ViewBag.Message</b></h6>
+		@if (!IsEditMode && !IsLoggedIn)
+		{
+			<p class="text-center">
+				<span>Already have an account?</span>
+				<a href="~/Authentication/Login">
+					<span>Sign in instead</span>
+				</a>
+			</p>
+		}
+	</div>
+</div>
+<!-- Registeration Card -->
+@section Scripts
+	{
+
+	<script type="text/javascript">
+		$(document).ready(function() {
+
+			function ValidateUser() {
+				event = event || window.event || event.srcElement;
+				var return_val = true;
+				if ($('#ContactNumber').val().trim() == '') {
+					$('#ContactNumber').next('span').show();
+					return_val = false;
+				} else {
+					$('#ContactNumber').next('span').hide();
+				}
+
+			}
+		});
+
+	</script>
+}

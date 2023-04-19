@@ -1,0 +1,230 @@
+﻿@inject IHttpContextAccessor HttpContextAccessor
+@model IEnumerable<BookViewModel>
+@{
+    ViewData["Title"] = "BookIndex";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    int IsAccess = 0;
+    bool IsLoggedIn = false;
+	var user = HttpContextAccessor.HttpContext.Session.GetObject<UserMstModel>("User");
+    var UserId = HttpContextAccessor.HttpContext.Session.GetString("UserId");
+    if (!string.IsNullOrWhiteSpace(UserId))
+    {
+        if (HttpContextAccessor.HttpContext.Session.GetString("AccessId") == "1")
+        {
+            IsAccess = 1;
+        }
+    }
+    if (user != null)
+	{
+		IsLoggedIn = true;
+	}
+	if (IsLoggedIn)
+	{
+
+	}
+	else
+	{
+		Context.Response.Redirect("/Authentication/LogOut");
+	}
+
+    int AddHasAccessPermission = 0;
+    int DeleteHasAccessPermission = 0;
+    int EditHasAccessPermission = 0;
+    int ViewHasAccessPermission = 0;
+
+    //var user = HttpContextAccessor.HttpContext.Session.GetObject<UserMstModel>("User");
+    var userRoleList = HttpContextAccessor.HttpContext.Session.GetObject<List<UserPermissionModel>>("UserRoleList");
+    //var userRoleList = HttpContext.Session.GetObject<List<UserPermissionModel>>("UserRoleList");
+    if (user != null)
+    {
+        if (userRoleList != null)
+        {
+            userRoleList = userRoleList.Where(x => x.UserId == user.UserId).ToList();
+            if (userRoleList.Count > 0)
+            {
+                userRoleList = userRoleList.Where(x => x.Permissionid == 3).ToList();
+                if (userRoleList.Count > 0)
+                {
+                    var AccessDetail = userRoleList.FirstOrDefault(x => x.AccessId == 1);
+                    if (AccessDetail != null)
+                    {
+                        AddHasAccessPermission = 1;
+                    }
+                }
+            }
+        }
+
+        if (userRoleList != null)
+        {
+            userRoleList = userRoleList.Where(x => x.UserId == user.UserId).ToList();
+            if (userRoleList.Count > 0)
+            {
+                userRoleList = userRoleList.Where(x => x.Permissionid == 3).ToList();
+                if (userRoleList.Count > 0)
+                {
+                    var AccessDetail = userRoleList.FirstOrDefault(x => x.AccessId == 2);
+                    if (AccessDetail != null)
+                    {
+                        DeleteHasAccessPermission = 2;
+                    }
+                }
+            }
+        }
+
+        if (userRoleList != null)
+        {
+            userRoleList = userRoleList.Where(x => x.UserId == user.UserId).ToList();
+            if (userRoleList.Count > 0)
+            {
+                userRoleList = userRoleList.Where(x => x.Permissionid == 3).ToList();
+                if (userRoleList.Count > 0)
+                {
+                    var AccessDetail = userRoleList.FirstOrDefault(x => x.AccessId == 3);
+                    if (AccessDetail != null)
+                    {
+                        EditHasAccessPermission = 3;
+                    }
+                }
+            }
+        }
+
+        if (userRoleList != null)
+        {
+            userRoleList = userRoleList.Where(x => x.UserId == user.UserId).ToList();
+            if (userRoleList.Count > 0)
+            {
+                userRoleList = userRoleList.Where(x => x.Permissionid == 3).ToList();
+                if (userRoleList.Count > 0)
+                {
+                    var AccessDetail = userRoleList.FirstOrDefault(x => x.AccessId == 4);
+                    if (AccessDetail != null)
+                    {
+                        ViewHasAccessPermission = 4;
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+<style>
+	.deletebtn {
+		width: auto;
+		padding: 10px 18px;
+		background-color:#bf0d0d;
+		border-radius: 1px;
+	}
+
+	.editbtn {
+		width: auto;
+		padding: 10px 18px;
+		background-color: #008CBA;
+		border-radius: 1px;
+	}
+
+	.addbtn {
+		width: auto;
+		padding: 10px 18px;
+		background-color: #4CAF50;
+		border-radius: 1px;
+	}
+
+    .dwnldbtn {
+       background-color: #a88116;
+        width: auto;
+		padding: 10px 18px;
+        border-radius: 1px;
+    }
+
+    	.btn {
+		color : #000000;
+	}
+</style>
+
+<div>
+
+    @if (AddHasAccessPermission == 1)
+    {
+        <span class="float-end"> <a asp-action="CreateBook" asp-controller="Book" class="btn addbtn" style="float:right;">New Book</a></span>
+    }
+    <br />
+    <br />
+</div>
+
+<html>
+<head>
+    <style>
+
+        div.a {
+            width: 200px;
+            color: #0079c1;
+            height: 2em;
+            line-height: 1em;
+            font-size: 20px;
+            font-weight: 400;
+            text-overflow: ellipsis;
+            margin-bottom: 12px;
+            cursor: pointer;
+            word-break: break-all;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+            div.a:hover {
+                overflow: visible;
+                white-space: normal;
+            }
+    </style>
+</head>
+<body>
+
+    @using (Html.BeginForm("BookIndex", "Book", FormMethod.Get))
+    {
+        <div>
+            <p>@ViewBag.Error</p>
+        </div>
+      
+            @if (Model != null && Model.Count() > 0)
+            {
+                <div class="jumbotron">
+                    <div class="row">
+                        @foreach (var bookViewModel in Model)
+                        {
+                            <div class="col-md-3">
+                                <div class="alert alert-success" role="alert" style="margin-top: 27px;">
+                                    
+                                    <div class="a"><h5 style="text-overflow:ellipsis">@bookViewModel.BookName</h5> </div>                                                                                                                   
+                                        
+                                        
+                                    <img src="~/Images/@bookViewModel.CoverImagePath" alt="@bookViewModel.CoverImagePath" height="200px" width="200px" id="imgDisplay" />
+                                    @*<img src="~/Images/@bookViewModel.CoverImagePath" alt="@bookViewModel.CoverImagePath" height="200px" width="200px" id="imgDisplay" />*@
+                                    <br />
+                                    
+                                </div>
+                                @if (EditHasAccessPermission == 3)
+                                {
+                                    @*<a asp-action="Editbook" asp-controller="Book" asp-route-id=@bookViewModel.BookId class="btn btn-success" style="float:left;">Edit Book</a>*@
+                                    @Html.ActionLink("Edit", "Editbook", new { id = bookViewModel.BookId}, new { @class = "btn editbtn"  ,@style="float: left;" })
+                                    @*<a asp-action="Editbook" asp-controller="Book" asp-route-id=@bookViewModel.BookId class="btn btn-success" style="float:left;">Edit Book</a>*@
+                                }
+                                
+                                <a asp-action="ViewBook" asp-controller="Home" asp-route-id=@bookViewModel.BookId style="margin-left:20px;" class="btn dwnldbtn">Download</a>
+                                @if (DeleteHasAccessPermission == 2)
+                                {
+                                    <a asp-action="Deletedbook" asp-controller="Book" asp-route-id=@bookViewModel.BookId class="btn deletebtn" style="float:right;">Remove</a>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <h3 class="alert-warning"> No Data Found...</h3>
+            }
+       
+    }
+</body>
+</html>

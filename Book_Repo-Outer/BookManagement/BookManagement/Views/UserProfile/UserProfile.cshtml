@@ -1,0 +1,47 @@
+﻿@inject IHttpContextAccessor HttpContextAccessor
+@model BookManagement.Models.UserMstModel
+@{
+	bool IsLoggedIn = false;
+	var user = HttpContextAccessor.HttpContext.Session.GetObject<UserMstModel>("User");
+
+	if (user != null)
+	{
+		IsLoggedIn = true;
+	}
+	if (IsLoggedIn)
+	{
+
+	}
+	else
+	{
+		Context.Response.Redirect("/Authentication/LogOut");
+	}
+}
+<!-- UserProfile Card -->
+<div class="card">
+	<div class="card-body">
+		<form id="userprofileform" class="mb-3" asp-controller="UserProfile" asp-action="UserProfile" method="POST">
+			<div>
+				<input type="hidden" class="form-control" id="userid" name="userid" value="@Model.UserId" autofocus />
+			</div>
+			<div class="mb-3">
+				<label for="FullName" class="form-label"><b>FullName :</b> @Model.FullName</label>
+			</div>
+			<div class="mb-3">
+				<label for="email" class="form-label"><b>Email :</b> @Model.Email</label>
+			</div>
+			<div class="mb-3">
+				<label for="UserName" class="form-label"><b>UserName :</b> @Model.UserName</label>
+			</div>
+			<div class="mb-3">
+				<label for="Address" class="form-label"><b>Address :</b> @Model.Address</label>
+			</div>
+			<div class="mb-3">
+				<label for="ContactNumber" class="form-label"><b>Contact Number :</b> @Model.ContactNumber</label>
+			</div>
+			<b style="color:red">@ViewBag.message</b>
+		</form>
+		@*<form> <button asp-controller="UserProfile" asp-action="UserProfile" class="btn btn-primary d-grid w-100">Cancel</button></form>*@
+	</div>
+</div>
+<!-- UserProfile Card -->
