@@ -1,0 +1,59 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Renya RCM</title>
+	<link href="~/css/login.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="mainContainer">
+        <div class="Container">
+            <div class="logoContainer">
+				@*<img src='./assets/Reyan-Blue-logo.png' class="imgStyle" alt="error" />*@
+                <img src="~/assets/reyan-blue-logo.png" class="imgStyle" alt="error" />
+            </div>
+
+            <div>
+                <form class="loginFormContainer">
+                    <div class="loginForm">
+                        <input type="hidden" class="inputFieldStyle" name="Id" id="Id" />
+
+                        <label htmlFor="text" class='labelStyle'>
+                            Username
+                        </label>
+                        <div class="inputFieldContainer">
+                            <input type="text" class="inputFieldStyle" placeholder="Enter username" required="required" name="Username" id="Username" />
+                            <p class="errorText">
+
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="loginForm1">
+                        <label htmlFor="text" class="labelStyle">
+                            Password
+                        </label>
+                        <div class="inputFieldContainer">
+                            <input type="password" class="inputFieldStyle" placeholder="Enter password" required="required" name="Password" id="Password" />
+                            <p class="errorText">
+
+                            </p>
+                        </div>
+                    </div>
+                    <div class="errorMessageContainer">
+                    </div>
+                    <div class="validationMessage" style="color:#28aed3">
+                        <h4 style="font-size:14px"><b>@ViewBag.message</b></h4>
+                    </div>
+                    <button title="Login" class="loginButtonStyle" type="submit">
+                        Login
+                    </button>
+                   
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

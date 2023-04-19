@@ -1,0 +1,13 @@
+[
+  {
+    "Id": 1,
+    "UserId": "1",
+    "Token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3ByaW1hcnlzaWQiOiIxIiwibmJmIjoxNjc3NDc0MTY4LCJleHAiOjE2Nzc0NzQ0NjgsImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjcxNDQvIiwiYXVkIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NzE0NC8ifQ.YHdEy6KG6vZhlMht8HveOu6I2F_kXL1IxGWVXziiH68",
+    "RefreshToken": "SLmthKmH72x+TVAMQQUtYr0jQn1sVXcizVInEn90rH8=",
+    "TockenExpiredOn": "2023-02-27T10:37:48.7834884+05:30",
+    "RefreshTockenExpiredOn": "2023-02-27T10:42:48.7834892+05:30",
+    "IsActive": true,
+    "CreatedDate": "2023-02-24T17:54:09.0753111+05:30",
+    "UpdatedDate": "2023-02-27T10:32:48.7834873+05:30"
+  }
+]

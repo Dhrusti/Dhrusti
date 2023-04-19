@@ -1,0 +1,16 @@
+﻿Read Me
+
+=======================================
+Install Nuget Before Run This Command :
+=======================================
+Microsoft.EntityFrameworkCore
+Microsoft.EntityFrameworkCore.SqlServer
+Microsoft.EntityFrameworkCore.Design
+Microsoft.EntityFrameworkCore.Tools
+=======================================
+
+1. Scaffold-DbContext to update DB models from latest DB
+
+Scaffold-DbContext "Server=.;user=sa;password=123;Database=RevenueCycleDB;Trusted_Connection=False;TrustServerCertificate=True;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Entities -force
+
+Scaffold-DbContext "Server=ARCHE-ITD450\SQLEXPRESS;user=sa;password=123;Database=RevenueCycleDB;Trusted_Connection=False;TrustServerCertificate=True;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Entities -force

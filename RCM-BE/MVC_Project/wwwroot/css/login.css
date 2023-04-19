@@ -1,0 +1,141 @@
+﻿body {
+    height: 100%
+}
+
+html {
+    height: 100%;
+}
+
+.mainContainer {
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+    .mainContainer .Container {
+        width: 28%;
+        height: 510px;
+        display: flex;
+        flex-direction: column;
+        margin: auto;
+        box-shadow: 5px 10px 5px 10px #ecf0f5;
+        border-radius: 50px;
+    }
+
+        .mainContainer .Container .logoContainer {
+            margin: 20px auto 30px auto;
+            width: 28%;
+            height: 150px;
+        }
+
+            .mainContainer .Container .logoContainer .imgStyle {
+                width: 100%;
+                height: 150px;
+            }
+
+        .mainContainer .Container .loginFormContainer {
+            display: flex;
+            flex-direction: column;
+        }
+
+            .mainContainer .Container .loginFormContainer .loginForm {
+                width: 100%;
+                height: 100px;
+            }
+
+                .mainContainer .Container .loginFormContainer .loginForm .labelStyle {
+                    font-size: 14px;
+                    font-weight: 500;
+                    padding: 20px;
+                    color: #28aed3;
+                }
+
+                .mainContainer .Container .loginFormContainer .loginForm .inputFieldStyle {
+                    width: 80%;
+                    margin: 5px 0px 10px 20px;
+                    border: none;
+                    border-bottom: 2px solid #8a8988;
+                    font-size: 12px;
+                }
+
+                    .mainContainer .Container .loginFormContainer .loginForm .inputFieldStyle:focus {
+                        outline: none !important;
+                        border: 1px solid #6d6d6e;
+                    }
+
+                .mainContainer .Container .loginFormContainer .loginForm .errorText {
+                    color: #f00;
+                    font-size: 12px;
+                    font-weight: 500;
+                    padding-left: 20px;
+                }
+
+            .mainContainer .Container .loginFormContainer .loginForm1 {
+                width: 100%;
+                height: 80px;
+            }
+
+                .mainContainer .Container .loginFormContainer .loginForm1 .labelStyle {
+                    font-size: 14px;
+                    font-weight: 500;
+                    padding: 20px;
+                    color: #28aed3;
+                }
+
+                .mainContainer .Container .loginFormContainer .loginForm1 .inputFieldStyle {
+                    width: 80%;
+                    margin: 5px 0px 10px 20px;
+                    border: none;
+                    border-bottom: 2px solid #8a8988;
+                    font-size: 12px;
+                }
+
+                    .mainContainer .Container .loginFormContainer .loginForm1 .inputFieldStyle:focus {
+                        outline: none !important;
+                        border: 1px solid #6d6d6e;
+                    }
+
+                .mainContainer .Container .loginFormContainer .loginForm1 .errorText {
+                    color: #f00;
+                    font-size: 12px;
+                    font-weight: 500;
+                    padding-left: 20px;
+                }
+
+            .mainContainer .Container .loginFormContainer .errorMessageContainer {
+                height: 30px;
+            }
+
+            .mainContainer .Container .loginFormContainer .errorMessage {
+                text-align: center;
+                color: #f00;
+                font-size: 14px;
+                padding: 0px 20px 20px 20px;
+            }
+
+            .mainContainer .Container .loginFormContainer .loginButtonStyle {
+                margin: auto;
+                width: 80px;
+                cursor: pointer;
+                background-color: #28aed3;
+                color: #ffffff;
+                text-align: center;
+                font-size: 14px;
+                padding: 7px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+
+.button {
+    width: 50px;
+    background-color: #28aed3;
+    color: #ffffff;
+    text-align: center;
+    font-size: 14px;
+    padding: 7px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}

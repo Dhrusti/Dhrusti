@@ -1,0 +1,207 @@
+﻿@using WebAPI.ViewModels.ResViewModels;
+@inject IHttpContextAccessor context
+@{
+	Layout = "~/Views/Shared/_Layout.cshtml";
+	var user = context.HttpContext.Session.GetObject<LoginResViewModel>("User");
+	GetAllAdminAppointmentResViewModel data1 = ViewBag.Data;
+	List<GetAllAdminAppointmentResViewModel.AdminAppointment> data = data1.AdminAppointmentList;
+}
+
+<style>
+	table {
+		font-family: arial, sans-serif;
+		border-collapse: collapse;
+		width: 100%;
+	}
+
+	td, th {
+		border: 1px solid #dddddd;
+		text-align: left;
+		padding: 8px;
+	}
+
+	tr:nth-child(even) {
+		background-color: #dddddd;
+	}
+
+	.fontstyle {
+		font-size: 16px;
+		font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;
+		margin-top: 5px;
+		margin-left: 5px;
+	}
+
+	.txtsearch {
+		border: 1px solid #d8d8d8;
+		height: 35px !important;
+		width: 300px !important;
+		font-size: 12px !important;
+		padding: 10px
+	}
+
+	.color-light {
+		background-color: #28aed3 !important;
+		font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;
+	}
+
+	.color-dark {
+		background-color: #3d87b3 !important;
+		border: none;
+		border-radius: 3px;
+		font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;
+	}
+
+
+	.cardborder {
+		border-top: 5px solid;
+		border-top-color: #3d87b3;
+		border-radius: 2px;
+		width: 1245px;
+		margin-left: 0px
+	}
+
+	.cardborder2 {
+		border-top: 1px solid;
+		border-top-color: #D8D8D8;
+		width: 1245px;
+		margin-left: 19px
+	}
+
+	.gridcardborder {
+		border-top: 5px solid;
+		border-top-color: #3d87b3;
+		border-radius: 2px;
+		width: 1245px;
+		margin-left: -102px;
+		margin-top: -100px;
+		height: 700px
+	}
+
+	.DashboardTable_tableHead__BJwTr {
+		background-color: #3d87b3;
+		border: 1px solid #D8D8D8;
+		color: white;
+		font-size: 12px;
+		font-weight: 700;
+		height: 30px;
+		padding: 0 10px;
+		text-align: left;
+	}
+
+	.featuredBtn.active {
+		background-color: #3d87b3 !important;
+		color: white;
+	}
+
+	.featuredBtn {
+		width: 250px;
+		height: 50px;
+		color: black;
+		font-weight: 700;
+		background-color: white;
+		border: none;
+		letter-spacing: 2px;
+		outline: none;
+	}
+
+</style>
+
+<div class="MainLayout_childrenContainer__OSVxe">
+	<div class="card-body">
+		<div class="fontstyle">
+			New Scheduling - Dashboard
+		</div>
+	</div>
+	<div class="card mt-1" style="width:1245px; margin-left:20px">
+		<div class="card-body cardborder">
+			<div class="row">
+				<div class="col-md-4">
+					<input type="text" class="form-control txtsearch" placeholder="Patient Name / DOB (mm-dd-yyyy) / Acc#">
+				</div>
+				<div class="col-md-1">
+					<button type="button" class="btn btn-info color-dark" style="margin-left:-78px; border-radius:7px;width:70px">Search</button>
+				</div>
+				<div class="col-md-5">
+					<button type="button" class="btn btn-info color-light" style="margin-left:-78px; border-radius:7px;width:70px">Clear</button>
+				</div>
+				<div class="col-md-2">
+					@*<button asp-action="AddNewSchedulingPatient" asp-controller="AddNewSchedulingPatient" class="btn btn-primary color-dark" style="margin-left: 20px;">Add New Scheduling</button>*@
+					<button value="Open" onclick="window.open('@Url.Action("AddNewSchedulingPatient", "AddNewScheduling")')" type="button" class="btn btn-primary color-dark" style="margin-left: 20px;">Add New Scheduling</button>
+				</div>
+
+			</div>
+		</div>
+	</div>
+	<div class="card-body cardborder2">
+		<div class="card mt-5" style="width:1245px; margin-left:-15px; padding:100px">
+			<div class="card-body gridcardborder">
+				<div class="row">
+					<div aria-label="Second group">
+						@*<button type="button" class="btn btn-primary color-dark" style="margin-left: -1px;margin-top:24px; padding-right:25px;padding-bottom:10px"><center>New Scheduling</center></button>*@
+						<button id="btnOne" type="button" class="btn btn-light featuredBtn active" value="@data1.TotalCount">New Scheduling(@data1.TotalCount)</button>
+
+						<button id="btnTwo" type="button" class="btn btn-light featuredBtn">Re-Scheduling</button>
+
+						<button id="btnThree" type="button" class="btn btn-light featuredBtn">Other</button>
+
+						<button id="btnFour" type="button" class="btn btn-light featuredBtn">Done</button>
+					</div>
+					<div class="Container" style="margin-top:65px">
+						<div class="table-condensed">
+							<table cellspacing="0">
+								<thead>
+									<tr>
+										<th class="DashboardTable_tableHead__BJwTr">#</th>
+										<th class="DashboardTable_tableHead__BJwTr">Acc</th>
+										<th class="DashboardTable_tableHead__BJwTr">Patient Name</th>
+										<th class="DashboardTable_tableHead__BJwTr">Primary Insurance Name</th>
+										<th class="DashboardTable_tableHead__BJwTr">Secondary Insurance Name</th>
+										<th class="DashboardTable_tableHead__BJwTr">Status</th>
+										<th class="DashboardTable_tableHead__BJwTr">Appt Time</th>
+										<th class="DashboardTable_tableHead__BJwTr">Entry Time</th>
+										<th class="DashboardTable_tableHead__BJwTr">DO Name</th>
+										<th class="DashboardTable_tableHead__BJwTr">Notes</th>
+										<th class="DashboardTable_tableHead__BJwTr">PDF</th>
+										<th class="DashboardTable_tableHead__BJwTr">Email</th>
+										<th class="DashboardTable_tableHead__BJwTr">Remark</th>
+									</tr>
+								</thead>
+								<tbody>
+									@foreach (var item in data)
+									{
+										<tr>
+											<td>@item.SR</td>
+											<td>@item.AccountNo</td>
+											<td>@item.PatientName</td>
+											<td>@item.PrimaryInsuranceName</td>
+											<td>@item.SecondaryInsuranceName</td>
+											<td>@item.Status</td>
+											<td>@item.ApptTime</td>
+											<td>@item.EntryTime</td>
+											<td>@item.DoName</td>
+											<td>@item.Notes</td>
+											<td>ABC.pdf</td>
+											<td>@item.Email</td>
+											<td>@item.Remark</td>
+										</tr>
+									}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script src="~/js/jquery.min.js"></script>
+<script type="text/javascript">
+
+	$(".featuredBtn").click(function () {
+		debugger;
+		$(".featuredBtn").removeClass('active');
+		$(this).addClass('active');
+	});
+
+</script>
+

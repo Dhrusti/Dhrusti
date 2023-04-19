@@ -1,0 +1,266 @@
+﻿body {
+    height: 100%;
+    margin: 0px;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    height: 100%;
+}
+
+.mainContainer {
+    width: 100%;
+    background-color: #ecf0f5;
+    display: flex;
+    flex-direction: row;
+}
+
+    .mainContainer .leftSideContainer {
+        width: 5%;
+    }
+
+    .mainContainer .rightSideContainer {
+        width: 95%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .mainContainer .rightSideContainer .headerContainer {
+            height: 50px;
+        }
+
+        .mainContainer .rightSideContainer .childrenContainer {
+            height: 100%;
+            padding: 0px 10px;
+        }
+
+/* 
+sidebar css */
+.sidebarContainer {
+    width: 100%;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+    .sidebarContainer .logo {
+        height: 49px;
+        background-color: #367fa9;
+    }
+
+        .sidebarContainer .logo h3 {
+            text-align: center;
+            /* padding: 10px 0px; */
+            color: #fff;
+        }
+
+    .sidebarContainer .navbarContainer {
+        width: 100%;
+        height: 100%;
+        background-color: #222d32;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .sidebarContainer .navbarContainer .avatarContainer {
+            width: 70%;
+            align-self: center;
+            margin: 8px 0px;
+        }
+
+            .sidebarContainer .navbarContainer .avatarContainer .avatarImage {
+                width: 100%;
+            }
+
+        .sidebarContainer .navbarContainer .sidebarContentContainer {
+            display: flex;
+            flex-direction: column;
+        }
+
+            .sidebarContainer .navbarContainer .sidebarContentContainer .sidebarContent {
+                color: #fff;
+                text-align: center;
+                /* padding: 8px 25px; */
+                text-decoration: none;
+                position: relative;
+                display: inline-block;
+            }
+
+                .sidebarContainer
+                .navbarContainer
+                .sidebarContentContainer
+                .sidebarContent
+                .customClassIcon {
+                    margin-left: 20px !important;
+                }
+
+                .sidebarContainer
+                .navbarContainer
+                .sidebarContentContainer
+                .sidebarContent
+                .tooltiptext {
+                    visibility: hidden;
+                    width: 150px;
+                    background-color: black;
+                    color: #fff;
+                    text-align: center;
+                    border-radius: 0px 6px 6px 0px;
+                    padding: 5px 0;
+                    /* Position the tooltip */
+                    position: absolute;
+                    z-index: 1;
+                    top: 3px;
+                    left: 105%;
+                }
+
+                .sidebarContainer
+                .navbarContainer
+                .sidebarContentContainer
+                .sidebarContent:hover
+                .tooltiptext {
+                    visibility: visible;
+                }
+
+                .sidebarContainer
+                .navbarContainer
+                .sidebarContentContainer
+                .sidebarContent
+                .tooltiptext1 {
+                    visibility: hidden;
+                    width: 150px;
+                    background-color: black;
+                    color: #fff;
+                    text-align: center;
+                    border-radius: 0px 6px 6px 0px;
+                    padding: 5px 0;
+                    /* Position the tooltip */
+                    position: absolute;
+                    z-index: 1;
+                    top: 3px;
+                    left: 94%;
+                }
+
+                .sidebarContainer
+                .navbarContainer
+                .sidebarContentContainer
+                .sidebarContent:hover
+                .tooltiptext1 {
+                    visibility: visible;
+                }
+
+.content {
+    padding: 8px 0px;
+}
+
+.meter {
+    text-align: center;
+    margin: auto;
+}
+
+
+/* sidebar css end  */
+/* navbar css  */
+
+.headerContainer {
+    background-color: #3d87b3;
+    width: 100%;
+    height: 50px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+    .headerContainer .leftSideContainer {
+        width: 10%;
+        display: flex;
+    }
+
+        .headerContainer .leftSideContainer .imageContainer {
+            width: 12%;
+            margin: auto 0px auto 15px;
+            cursor: pointer;
+        }
+
+            .headerContainer .leftSideContainer .imageContainer .imagestyle {
+                width: 100%;
+            }
+
+                .headerContainer .leftSideContainer .imageContainer .imagestyle:hover {
+                    background-color: #fff;
+                }
+
+    .headerContainer .rightSideContainer {
+        width: 28%;
+        display: flex;
+        flex-direction: row;
+    }
+
+        .headerContainer .rightSideContainer .rightSideImageContainer {
+            align-items: center;
+            width: 8%;
+            margin: auto 0px auto 24px;
+            cursor: pointer;
+        }
+
+            .headerContainer .rightSideContainer .rightSideImageContainer .headerIconStyle {
+                cursor: pointer;
+                margin-top: 6px;
+            }
+
+            .headerContainer .rightSideContainer .rightSideImageContainer .notyIconStyle {
+                position: relative;
+                display: inline;
+                top: 4px;
+            }
+
+                .headerContainer .rightSideContainer .rightSideImageContainer .notyIconStyle .notyNumStyle {
+                    width: 17px;
+                    display: inline;
+                    position: absolute;
+                    left: 9px;
+                    bottom: 14px;
+                    background-color: #f00;
+                    color: #222d32;
+                    font-size: 11px;
+                    text-align: center;
+                    padding: 0px 2px;
+                    border-radius: 20px;
+                }
+
+            .headerContainer .rightSideContainer .rightSideImageContainer .rightSideImagestyle {
+                width: 100%;
+            }
+
+                .headerContainer .rightSideContainer .rightSideImageContainer .rightSideImagestyle:hover {
+                    background-color: #222d32;
+                }
+
+        .headerContainer .rightSideContainer .avatarContainer {
+            display: flex;
+            flex-direction: row;
+            width: 50%;
+        }
+
+            .headerContainer .rightSideContainer .avatarContainer .rightSideImageContainer1 {
+                align-items: center;
+                width: 15%;
+                margin: auto 0px auto 18px;
+                cursor: pointer;
+            }
+
+                .headerContainer .rightSideContainer .avatarContainer .rightSideImageContainer1 .rightSideImagestyle1 {
+                    width: 100%;
+                }
+
+        .headerContainer .rightSideContainer .usernameText {
+            margin: auto 0px auto 6px;
+            font-size: var(--XXSmall);
+            cursor: pointer;
+        }
+
+
+/* navbar css end */
+
+
