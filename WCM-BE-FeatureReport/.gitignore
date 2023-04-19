@@ -1,0 +1,5 @@
+.vs
+bin
+obj
+/WaltCapitalManagement/WaltCapitalManagementWebAPI/wwwroot/Files
+/WaltCapitalManagement/WaltCapitalManagementWebAPI/wwwroot/Logs
